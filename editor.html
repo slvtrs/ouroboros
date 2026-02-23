@@ -56,6 +56,7 @@
 
     <script>
         let currentCode = "";
+        let lastPrompt = "";
 
         // Seed currentCode with index.html so Claude has context from the first message
         fetch('index.html')
@@ -165,6 +166,7 @@
                 return;
             }
 
+            lastPrompt = prompt;
             input.value = "";
             btn.disabled = true;
             btn.innerText = "Claude is vibing...";
@@ -224,7 +226,7 @@
                     method: "PUT",
                     headers: { "Authorization": `token ${token}`, "Content-Type": "application/json" },
                     body: JSON.stringify({
-                        message: "Vibe update",
+                        message: lastPrompt ? lastPrompt.slice(0, 72) : "Vibe update",
                         content: btoa(unescape(encodeURIComponent(currentCode))), // Fix for special characters
                         sha: fileData.sha
                     })
