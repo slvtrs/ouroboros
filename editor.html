@@ -18,7 +18,7 @@
 <body class="h-screen flex flex-col bg-zinc-900 text-white overflow-hidden">
 
     <header class="p-4 border-b border-zinc-800 flex justify-between items-center bg-zinc-950">
-        <h1 class="font-bold tracking-tighter text-xl">SORO<span class="text-blue-500">BORUO</span></h1>
+        <h1 class="font-bold tracking-tighter text-xl">SORO<span class="X-text-blue-500">BO<span style="display:inline-block;transform:scaleX(-1)">R</span>UO</span></h1>
         <div class="space-x-2 flex">
             <button onclick="toggleSettings()" class="px-3 py-1 bg-zinc-800 rounded hover:bg-zinc-700 text-sm">Settings</button>
             <button onclick="publishToGithub()" id="publish-btn" class="px-4 py-1 bg-blue-600 rounded hover:bg-blue-500 font-bold text-sm">Publish to GitHub</button>
@@ -40,21 +40,11 @@
         <div id="resize-handle" class="w-1 bg-zinc-800 hover:bg-blue-500 cursor-col-resize transition-colors flex-shrink-0"></div>
 
         <div class="flex-1 bg-white overflow-hidden">
-            <iframe id="preview-frame" srcdoc="<body style='display:flex;justify-content:center;align-items:center;height:100vh;font-family:sans-serif;'>Preview will appear here</body>"></iframe>
+            <iframe id="preview-frame" src="index.html"></iframe>
         </div>
     </main>
 
-    <div id="auth-modal" class="fixed inset-0 bg-black/90 flex items-center justify-center p-4 z-50">
-        <div class="bg-zinc-900 p-6 rounded-lg w-full max-w-sm border border-zinc-700">
-            <h2 class="text-xl font-bold mb-4">Vibe Password</h2>
-            <input id="auth-password" type="password" placeholder="Enter password"
-                class="w-full bg-zinc-800 p-2 mb-4 rounded border border-zinc-700 focus:outline-none focus:border-blue-500">
-            <button onclick="submitAuth()" class="w-full py-2 bg-blue-600 rounded font-bold hover:bg-blue-500">Enter</button>
-            <p id="auth-error" class="text-red-400 text-sm mt-2 hidden">Incorrect password.</p>
-        </div>
-    </div>
-
-    <div id="settings-modal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center p-4">
+<div id="settings-modal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center p-4">
         <div class="bg-zinc-900 p-6 rounded-lg w-full max-w-md border border-zinc-700">
             <h2 class="text-xl font-bold mb-4">Settings</h2>
             <input id="claude-key" type="password" placeholder="Claude API Key" class="w-full bg-zinc-800 p-2 mb-2 rounded border border-zinc-700">
@@ -65,50 +55,12 @@
     </div>
 
     <script>
-      // --- SECURE HASHED PROTECTION ---
-      // This is the SHA-256 hash of the password "vibe123" 
-      // (You should generate your own hash and replace this string!)
-      const PASSWORD_HASH = "77A4ABD9C79251BAC0797CD97AA89B0B413AC48D36264A53235BE48FC9198FB3";
-
-      async function sha256(message) {
-          const msgBuffer = new TextEncoder().encode(message);
-          const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
-          const hashArray = Array.from(new Uint8Array(hashBuffer));
-          return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-      }
-
-      const authModal = document.getElementById('auth-modal');
-      if (sessionStorage.getItem('vibe_auth') === 'true') {
-          authModal.classList.add('hidden');
-      }
-
-      document.getElementById('auth-password').addEventListener('keydown', e => {
-          if (e.key === 'Enter') submitAuth();
-      });
-
-      async function submitAuth() {
-          const pass = document.getElementById('auth-password').value;
-          const hashedInput = await sha256(pass);
-          if (hashedInput.toUpperCase() === PASSWORD_HASH) {
-              sessionStorage.setItem('vibe_auth', 'true');
-              authModal.classList.add('hidden');
-          } else {
-              document.getElementById('auth-error').classList.remove('hidden');
-              document.getElementById('auth-password').value = '';
-              document.getElementById('auth-password').focus();
-          }
-      }
-      // --- END PROTECTION ---
-      
         let currentCode = "";
 
-        // Load index.html into preview and seed currentCode
+        // Seed currentCode with index.html so Claude has context from the first message
         fetch('index.html')
             .then(r => r.text())
-            .then(html => {
-                currentCode = html;
-                document.getElementById('preview-frame').srcdoc = html;
-            })
+            .then(html => { currentCode = html; })
             .catch(() => {});
 
         // UI Logic
@@ -155,8 +107,8 @@
 
         function addChatMessage(role, text) {
             const div = document.createElement('div');
-            div.className = role === 'user' ? 'text-blue-400' : 'text-zinc-300';
-            div.innerHTML = `<strong>${role.toUpperCase()}:</strong> ${text}`;
+            div.className = role === 'user' ? 'text-blue-400' : role === 'error' ? 'text-red-400' : 'text-zinc-300';
+            div.innerHTML = `<strong>${role === 'error' ? 'ERROR' : role.toUpperCase()}:</strong> ${text}`;
             document.getElementById('chat-history').appendChild(div);
             document.getElementById('chat-history').scrollTop = document.getElementById('chat-history').scrollHeight;
         }
@@ -203,7 +155,15 @@
             const input = document.getElementById('vibe-input');
             const btn = document.getElementById('send-btn');
             const prompt = input.value;
-            if(!prompt) return;
+            if (!prompt) return;
+
+            const missing = [
+                { key: 'vibe_claude_key', label: 'Claude API Key' },
+            ].filter(s => !localStorage.getItem(s.key));
+            if (missing.length) {
+                addChatMessage('error', `Missing required settings: ${missing.map(s => s.label).join(', ')} — open Settings to configure.`);
+                return;
+            }
 
             input.value = "";
             btn.disabled = true;
@@ -236,7 +196,7 @@
                 addChatMessage('claude', "Updated preview!");
             } catch (err) {
                 hideThinking();
-                addChatMessage('claude', "Error: " + err.message);
+                addChatMessage('error', err.message);
             } finally {
                 btn.disabled = false;
                 btn.innerText = "Send Vibe";
