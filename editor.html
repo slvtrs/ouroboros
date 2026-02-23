@@ -21,6 +21,7 @@
         <h1 class="font-bold tracking-tighter text-xl cursor-pointer hover:opacity-80 transition-opacity" onclick="navigateHome()">SORO<span class="X-text-blue-500">BO<span style="display:inline-block;transform:scaleX(-1)">R</span>UO</span></h1>
         <div class="space-x-2 flex">
             <button onclick="toggleSettings()" class="px-3 py-1 bg-zinc-800 rounded hover:bg-zinc-700 text-sm">Settings</button>
+            <button onclick="revertLastCommit()" id="revert-btn" class="px-3 py-1 bg-zinc-800 rounded hover:bg-red-900 hover:text-red-300 text-sm transition-colors">Revert</button>
             <button onclick="publishToGithub()" id="publish-btn" class="px-4 py-1 bg-blue-600 rounded hover:bg-blue-500 font-bold text-sm">Publish to GitHub</button>
         </div>
     </header>
@@ -251,6 +252,65 @@
                 alert("GitHub Error: " + err.message);
             } finally {
                 btn.innerText = "Publish to GitHub";
+            }
+        }
+
+        // Revert last commit
+        async function revertLastCommit() {
+            const btn = document.getElementById('revert-btn');
+            const token = localStorage.getItem('vibe_gh_token');
+            const repo = localStorage.getItem('vibe_gh_repo');
+
+            if (!token || !repo) return alert("GitHub Token and Repo must be set in Settings.");
+            if (!confirm("This will revert index.html to the previous commit and push it. Continue?")) return;
+
+            btn.innerText = "Reverting...";
+            btn.disabled = true;
+            try {
+                // Get the last two commits touching index.html
+                const commitsRes = await fetch(`https://api.github.com/repos/${repo}/commits?path=index.html&per_page=2`, {
+                    headers: { "Authorization": `token ${token}` }
+                });
+                const commits = await commitsRes.json();
+                if (!commits[1]) return alert("No previous commit to revert to.");
+
+                const prevSha = commits[1].sha;
+                const prevMessage = commits[1].commit.message;
+
+                // Get the file content at that commit
+                const prevFileRes = await fetch(`https://api.github.com/repos/${repo}/contents/index.html?ref=${prevSha}`, {
+                    headers: { "Authorization": `token ${token}` }
+                });
+                const prevFile = await prevFileRes.json();
+
+                // Get current file SHA (needed for the update)
+                const currFileRes = await fetch(`https://api.github.com/repos/${repo}/contents/index.html`, {
+                    headers: { "Authorization": `token ${token}` }
+                });
+                const currFile = await currFileRes.json();
+
+                // Push the old content as a new commit
+                await fetch(`https://api.github.com/repos/${repo}/contents/index.html`, {
+                    method: "PUT",
+                    headers: { "Authorization": `token ${token}`, "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        message: `Revert to: ${prevMessage}`,
+                        content: prevFile.content.replace(/\n/g, ''),
+                        sha: currFile.sha
+                    })
+                });
+
+                // Update local preview and code to match
+                const reverted = atob(prevFile.content.replace(/\n/g, ''));
+                currentCode = reverted;
+                document.getElementById('preview-frame').srcdoc = reverted;
+                hasUnpublishedChanges = false;
+                addChatMessage('claude', `Reverted to: "${prevMessage}"`);
+            } catch (err) {
+                alert("Revert failed: " + err.message);
+            } finally {
+                btn.innerText = "Revert";
+                btn.disabled = false;
             }
         }
 
