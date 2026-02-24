@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Vibe Editor</title>
+    <title>SOROBORUO</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         #preview-frame { width: 100%; height: 100%; border: none; background: white; }
@@ -271,14 +271,67 @@
                     },
                     body: JSON.stringify({
                         model: "claude-sonnet-4-6",
-                        max_tokens: 4000,
-                        system: "You are a website builder. Return ONLY the full source code of a single-file HTML website including Tailwind CSS (via CDN) and any necessary JS. Do not explain anything.",
-                        messages: [{ role: "user", content: `Current Code: ${currentCode}\n\nTask: ${prompt}` }]
+                        max_tokens: 8000,
+                        system: currentCode
+                            ? `You are a website editor. The user will ask you to modify an existing HTML page.
+Respond ONLY with one or more patches in this exact format — no other text, no markdown fences:
+
+<<<FIND>>>
+exact text from the current page to replace (must match exactly, including whitespace)
+<<<REPLACE>>>
+new text to put in its place
+<<<END>>>
+
+You can include multiple patches in sequence. Each patch is applied in order.
+If the user wants a completely new page (not a modification), respond instead with ONLY the full HTML starting with <!DOCTYPE html>.`
+                            : `You are a website builder. Return ONLY the complete HTML source code of a single-file website. Start with <!DOCTYPE html>. Include Tailwind CSS via CDN and any necessary JS inline. No explanations, no markdown fences.`,
+                        messages: [{ role: "user", content: currentCode ? `Current page:\n${currentCode}\n\nTask: ${prompt}` : `Task: ${prompt}` }]
                     })
                 });
 
                 const data = await response.json();
-                currentCode = data.content[0].text.replace(/^```[\w]*\n?/, '').replace(/\n?```$/, '');
+                const rawText = data.content[0].text.trim();
+
+                console.log('%c[ouroboros] raw response:', 'color: #a78bfa; font-weight: bold');
+                console.log(rawText);
+
+                if (data.stop_reason === 'max_tokens') {
+                    addChatMessage('error', "Response was cut off (hit token limit) — the preview may be incomplete.");
+                }
+
+                let newCode;
+                if (rawText.includes('<<<FIND>>>')) {
+                    // Patch mode: apply find/replace patches to currentCode
+                    newCode = currentCode;
+                    const patchRegex = /<<<FIND>>>([\s\S]*?)<<<REPLACE>>>([\s\S]*?)<<<END>>>/g;
+                    let match;
+                    let patchCount = 0;
+                    while ((match = patchRegex.exec(rawText)) !== null) {
+                        const find = match[1].trim();
+                        const replace = match[2].trim();
+                        if (newCode.includes(find)) {
+                            newCode = newCode.replace(find, replace);
+                            patchCount++;
+                        } else {
+                            console.warn('[ouroboros] patch FIND text not found:', find);
+                        }
+                    }
+                    if (patchCount === 0) {
+                        hideThinking();
+                        addChatMessage('error', "Couldn't apply patches — no matching text found. Raw response logged to console.");
+                        return;
+                    }
+                } else {
+                    // Full HTML mode
+                    newCode = rawText.replace(/^```[\w]*\n?/, '').replace(/\n?```$/, '').trim();
+                    if (!newCode || !newCode.includes('<')) {
+                        hideThinking();
+                        addChatMessage('error', "Claude didn't return valid HTML or patches — raw response logged to console.");
+                        return;
+                    }
+                }
+
+                currentCode = newCode;
                 document.getElementById('preview-frame').srcdoc = currentCode;
                 hasUnpublishedChanges = true;
                 document.getElementById('publish-btn').classList.remove('hidden');
