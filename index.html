@@ -253,7 +253,10 @@
                 panel.classList.add('hidden');
                 panel.classList.remove('flex');
                 chat.classList.remove('hidden');
-                footer.classList.remove('hidden');
+                // Don't restore chat footer if still previewing a historical commit
+                if (document.getElementById('preview-footer').classList.contains('hidden')) {
+                    footer.classList.remove('hidden');
+                }
                 btn.classList.remove('text-white');
                 btn.classList.add('text-zinc-400');
                 title.classList.add('hidden');
