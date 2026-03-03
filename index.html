@@ -15,6 +15,16 @@
         .thinking-dot { animation: thinking-bounce 1.2s infinite ease-in-out; }
         .thinking-dot:nth-child(2) { animation-delay: 0.2s; }
         .thinking-dot:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes popup-in {
+            from { opacity: 0; transform: translateY(10px) scale(0.97); }
+            to   { opacity: 1; transform: translateY(0)    scale(1); }
+        }
+        @keyframes popup-out {
+            from { opacity: 1; transform: translateY(0)    scale(1); }
+            to   { opacity: 0; transform: translateY(10px) scale(0.97); }
+        }
+        .popup-enter { animation: popup-in  0.18s ease-out forwards; }
+        .popup-exit  { animation: popup-out 0.14s ease-in  forwards; }
     @media (prefers-color-scheme: light) {
         #edit-btn {
             background-color: #ffffff !important;
@@ -49,12 +59,6 @@
         #chat-popup #publish-btn:hover { background-color: #3b82f6 !important; }
         #chat-popup .bg-zinc-700 { background-color: #e4e4e7 !important; }
         #chat-popup .bg-zinc-700:hover { background-color: #d4d4d8 !important; }
-        #about-modal > div { background-color: #ffffff !important; border-color: #d4d4d8 !important; }
-        #about-modal .text-white  { color: #09090b !important; }
-        #about-modal .text-zinc-300 { color: #52525b !important; }
-        #about-modal .text-zinc-400 { color: #71717a !important; }
-        #about-modal .text-zinc-500 { color: #a1a1aa !important; }
-        #about-modal .hover\:bg-zinc-800:hover { background-color: #f4f4f5 !important; }
     }
     </style>
 </head>
@@ -75,13 +79,14 @@
         <div class="px-4 pt-4 pb-3 border-b border-zinc-800 flex items-center justify-between flex-shrink-0">
             <span id="remaining-count" onclick="syncAndUpdateRemaining()" title="Click to refresh" class="text-zinc-400 text-sm cursor-pointer hover:text-white transition-colors" style="padding-right: 1rem;"></span>
             <span id="history-title" class="hidden text-white text-sm font-semibold">Contribution Log</span>
+            <span id="about-title" class="hidden text-white text-sm font-semibold">About The Vibe Cadaver</span>
             <div class="flex items-center gap-1">
                 <button onclick="toggleHistory()" id="history-btn" title="History" class="text-zinc-400 hover:text-white transition-colors p-1 rounded hover:bg-zinc-800">
                     <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
                     </svg>
                 </button>
-                <button onclick="toggleAbout()" title="About" class="text-zinc-400 hover:text-white transition-colors p-1 rounded hover:bg-zinc-800">
+                <button onclick="toggleAbout()" id="about-btn" title="About" class="text-zinc-400 hover:text-white transition-colors p-1 rounded hover:bg-zinc-800">
                     <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/>
                     </svg>
@@ -99,6 +104,13 @@
 
         <div id="history-panel" class="hidden flex-1 overflow-y-auto flex-col text-sm text-white">
             <div id="history-list" class="divide-y divide-zinc-800"></div>
+        </div>
+
+        <div id="about-panel" class="hidden flex-1 overflow-y-auto p-4 text-sm text-zinc-300 space-y-4 leading-relaxed">
+            <p>A living webpage shaped by strangers, one change at a time.</p>
+            <p>Inspired by <em>exquisite corpse</em> — the surrealist game where each collaborator adds to a work without seeing the whole — Vibe Cadaver applies that spirit to a shared website. Every visitor can change one thing. The page accumulates.</p>
+            <p>Type your change. Preview it. Publish it.</p>
+            <p id="about-limit" class="text-zinc-500"></p>
         </div>
 
         <div id="chat-footer" class="p-4 border-t border-zinc-800 flex-shrink-0">
@@ -121,25 +133,6 @@
     <!-- [own-key] settings modal removed; restore with toggleSettings() if re-enabling own key -->
     <!-- [own-key] <div id="settings-modal" ...> ... </div> -->
 
-    <!-- About modal -->
-    <div id="about-modal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-50">
-        <div class="bg-zinc-900 p-6 rounded-lg w-full max-w-md border border-zinc-700">
-            <div class="flex items-center justify-between mb-5">
-                <h2 class="text-xl font-bold text-white tracking-tight">Vibe Cadaver</h2>
-                <button onclick="toggleAbout()" class="text-zinc-400 hover:text-white transition-colors p-1 rounded hover:bg-zinc-800">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
-                    </svg>
-                </button>
-            </div>
-            <div class="space-y-4 text-sm text-zinc-300 leading-relaxed">
-                <p>A living webpage shaped by strangers, one change at a time.</p>
-                <p>Inspired by <em>exquisite corpse</em> — the surrealist game where each collaborator adds to a work without seeing the whole — Vibe Cadaver applies that spirit to a shared website. Every visitor can change one thing. The page accumulates.</p>
-                <p>Type your change. Preview it. Publish it.</p>
-                <p id="about-limit" class="text-zinc-500"></p>
-            </div>
-        </div>
-    </div>
 
     <script>
         function b64decode(b64) {
@@ -184,8 +177,18 @@
 
         function toggleChat() {
             const popup = document.getElementById('chat-popup');
-            const isHidden = popup.classList.toggle('hidden');
-            if (!isHidden) syncAndUpdateRemaining();
+            if (popup.classList.contains('hidden')) {
+                popup.classList.remove('hidden', 'popup-exit');
+                popup.classList.add('popup-enter');
+                syncAndUpdateRemaining();
+            } else {
+                popup.classList.remove('popup-enter');
+                popup.classList.add('popup-exit');
+                popup.addEventListener('animationend', () => {
+                    popup.classList.add('hidden');
+                    popup.classList.remove('popup-exit');
+                }, { once: true });
+            }
         }
 
         async function syncAndUpdateRemaining() {
@@ -218,8 +221,18 @@
         // Seed currentCode and update iframe via b64decode to guarantee correct UTF-8 rendering
         loadFreshContent({ updateIframe: true });
 
+        // Auto-open contribute panel on first visit if user stays idle
+        if (!localStorage.getItem('visited_before')) {
+            localStorage.setItem('visited_before', '1');
+            const autoOpen = setTimeout(() => toggleChat(), 3000);
+            const cancel = () => { clearTimeout(autoOpen); cancelEvents.forEach(e => window.removeEventListener(e, cancel)); };
+            const cancelEvents = ['click', 'keydown', 'scroll', 'touchstart'];
+            cancelEvents.forEach(e => window.addEventListener(e, cancel, { once: true }));
+        }
+
         // UI Logic
         let historyOpen = false;
+        let aboutOpen = false;
 
         function timeAgo(dateStr) {
             const seconds = Math.floor((Date.now() - new Date(dateStr)) / 1000);
@@ -242,6 +255,14 @@
             const title = document.getElementById('history-title');
 
             if (historyOpen) {
+                // Close about if open
+                if (aboutOpen) {
+                    aboutOpen = false;
+                    document.getElementById('about-panel').classList.add('hidden');
+                    document.getElementById('about-btn').classList.remove('text-white');
+                    document.getElementById('about-btn').classList.add('text-zinc-400');
+                    document.getElementById('about-title').classList.add('hidden');
+                }
                 chat.classList.add('hidden');
                 footer.classList.add('hidden');
                 panel.classList.remove('hidden');
@@ -328,8 +349,43 @@
         }
 
         function toggleAbout() {
-            document.getElementById('about-modal').classList.toggle('hidden');
-            document.getElementById('about-limit').textContent = `${DAILY_LIMIT} contributions per day.`;
+            aboutOpen = !aboutOpen;
+            const panel = document.getElementById('about-panel');
+            const chat = document.getElementById('chat-history');
+            const footer = document.getElementById('chat-footer');
+            const btn = document.getElementById('about-btn');
+            const remaining = document.getElementById('remaining-count');
+            const title = document.getElementById('about-title');
+
+            if (aboutOpen) {
+                // Close history if open
+                if (historyOpen) {
+                    historyOpen = false;
+                    document.getElementById('history-panel').classList.add('hidden');
+                    document.getElementById('history-panel').classList.remove('flex');
+                    document.getElementById('history-btn').classList.remove('text-white');
+                    document.getElementById('history-btn').classList.add('text-zinc-400');
+                    document.getElementById('history-title').classList.add('hidden');
+                }
+                chat.classList.add('hidden');
+                footer.classList.add('hidden');
+                panel.classList.remove('hidden');
+                btn.classList.add('text-white');
+                btn.classList.remove('text-zinc-400');
+                remaining.classList.add('hidden');
+                title.classList.remove('hidden');
+                document.getElementById('about-limit').textContent = `${DAILY_LIMIT} contributions per day.`;
+            } else {
+                panel.classList.add('hidden');
+                chat.classList.remove('hidden');
+                if (document.getElementById('preview-footer').classList.contains('hidden')) {
+                    footer.classList.remove('hidden');
+                }
+                btn.classList.remove('text-white');
+                btn.classList.add('text-zinc-400');
+                title.classList.add('hidden');
+                remaining.classList.remove('hidden');
+            }
         }
         function toggleSettings() { document.getElementById('settings-modal').classList.toggle('hidden'); }
         const WORKER_URL = "https://ouroboros-worker.soroboruo.workers.dev"
