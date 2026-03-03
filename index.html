@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>SOROBORUO</title>
+    <title>VibeCadaver</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         #preview-frame { width: 100%; height: 100%; border: none; background: white; }
@@ -13,15 +13,6 @@
         .thinking-dot { animation: thinking-bounce 1.2s infinite ease-in-out; }
         .thinking-dot:nth-child(2) { animation-delay: 0.2s; }
         .thinking-dot:nth-child(3) { animation-delay: 0.4s; }
-        @keyframes ouroboros-rotate { to { transform: rotate(360deg); } }
-        .ouroboros-spin {
-            animation: ouroboros-rotate 20s linear infinite;
-            transform-box: fill-box;
-            transform-origin: center;
-            transition: opacity 0.3s;
-        }
-        #edit-btn:hover .ouroboros-spin { animation-duration: 4s; }
-        .ouroboros-spin.spin-fast { animation-duration: 0.38s !important; }
     </style>
 </head>
 <body class="h-screen bg-white overflow-hidden">
@@ -29,35 +20,26 @@
     <!-- Full-screen preview -->
     <iframe id="preview-frame" src="content.html" class="w-full h-full border-none block"></iframe>
 
-    <!-- Floating Transmute button -->
+    <!-- Floating contribute button -->
     <button onclick="toggleChat()" id="edit-btn"
         class="fixed bottom-6 left-6 px-5 py-2.5 bg-zinc-900 text-white text-sm font-bold tracking-widest rounded-full shadow-xl z-40 border border-zinc-700 opacity-40 hover:opacity-100 transition-opacity">
-        TRANSMUTE
+        CONTRIBUTE
     </button>
 
     <!-- Chat popup -->
-    <div id="chat-popup" class="hidden fixed bottom-24 left-6 w-80 flex flex-col bg-zinc-950 border border-zinc-700 rounded-xl shadow-2xl z-50 overflow-hidden" style="height: 520px;">
+    <div id="chat-popup" class="hidden fixed bottom-24 left-6 w-100 flex flex-col bg-zinc-950 border border-zinc-700 rounded-xl shadow-2xl z-50 overflow-hidden" style="height: 520px;">
 
         <div class="px-4 pt-4 pb-3 border-b border-zinc-800 flex items-center justify-between flex-shrink-0">
-            <div class="flex items-center gap-2">
-                <svg id="ouroboros-svg" class="ouroboros-spin w-6 h-6 flex-shrink-0" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M 41.5 81.9 A 33 33 0 1 1 58.5 81.9" fill="none" stroke="white" stroke-width="9" stroke-linecap="butt"/>
-                    <ellipse cx="66.5" cy="79" rx="11" ry="5.8" transform="rotate(-15 66.5 79)" fill="white"/>
-                    <ellipse cx="59.5" cy="81.9" rx="3.5" ry="3.2" fill="#18181b"/>
-                    <path d="M 57 82 L 49 82 M 49 82 L 46 79.5 M 49 82 L 46 84.5" stroke="#f87171" stroke-width="1.5" fill="none" stroke-linecap="round"/>
-                    <path d="M 42.7 77.6 Q 52 79 57 82 Q 52 85.5 40.3 86.3 Z" fill="white"/>
-                </svg>
-                <h1 class="font-bold tracking-tighter text-xl text-white">SORO<span class="X-text-blue-500">BO<span style="display:inline-block;transform:scaleX(-1)">R</span>UO</span></h1>
-            </div>
+            <span id="remaining-count" class="text-zinc-400 text-sm" style="padding-right: 1rem;"></span>
             <div class="flex items-center gap-1">
+                <button onclick="toggleHistory()" id="history-btn" title="History" class="text-zinc-400 hover:text-white transition-colors p-1 rounded hover:bg-zinc-800">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.95"/>
+                    </svg>
+                </button>
                 <button onclick="toggleAbout()" title="About" class="text-zinc-400 hover:text-white transition-colors p-1 rounded hover:bg-zinc-800">
                     <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/>
-                    </svg>
-                </button>
-                <button onclick="toggleSettings()" title="Settings" class="text-zinc-400 hover:text-white transition-colors p-1 rounded hover:bg-zinc-800">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
                     </svg>
                 </button>
                 <button onclick="toggleChat()" title="Close" class="text-zinc-400 hover:text-white transition-colors p-1 rounded hover:bg-zinc-800">
@@ -71,36 +53,26 @@
         <div id="chat-history" class="flex-1 p-4 overflow-y-auto space-y-4 text-sm text-white">
         </div>
 
-        <div class="p-4 border-t border-zinc-800 flex-shrink-0">
-            <textarea id="vibe-input" placeholder="e.g. 'Make it a dark mode portfolio with neon pink accents...'"
+        <div id="history-panel" class="hidden flex-1 overflow-y-auto flex-col text-sm text-white">
+            <div id="history-list" class="divide-y divide-zinc-800"></div>
+        </div>
+
+        <div id="chat-footer" class="p-4 border-t border-zinc-800 flex-shrink-0">
+            <textarea id="vibe-input" placeholder="What will you change?"
                 class="w-full bg-zinc-900 border border-zinc-700 rounded p-2 focus:outline-none focus:border-blue-500 h-20 resize-none text-sm text-white"></textarea>
-            <button onclick="sendVibe()" id="send-btn" class="w-full mt-2 py-2 bg-white text-black font-bold rounded hover:bg-zinc-200 transition text-sm">Send</button>
-            <button onclick="publishToGithub()" id="publish-btn" class="hidden w-full mt-2 py-2 bg-blue-600 font-bold rounded hover:bg-blue-500 transition text-sm text-white">Publish to GitHub</button>
+            <button onclick="sendVibe()" id="send-btn" class="w-full mt-2 py-2 bg-white text-black font-bold rounded hover:bg-zinc-200 transition text-sm">Change</button>
+            <button onclick="publishToGithub()" id="publish-btn" class="hidden w-full mt-2 py-2 bg-blue-600 font-bold rounded hover:bg-blue-500 transition text-sm text-white">Publish</button>
         </div>
     </div>
 
-    <!-- Settings modal -->
-    <div id="settings-modal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-50">
-        <div class="bg-zinc-900 p-6 rounded-lg w-full max-w-md border border-zinc-700">
-            <div class="flex items-center justify-between mb-4">
-                <h2 class="text-xl font-bold text-white">Settings</h2>
-                <button onclick="toggleSettings()" class="text-zinc-400 hover:text-white transition-colors p-1 rounded hover:bg-zinc-800">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
-                    </svg>
-                </button>
-            </div>
-            <input id="claude-key" type="password" placeholder="Claude API Key" class="w-full bg-zinc-800 p-2 mb-2 rounded border border-zinc-700 text-white">
-            <input id="gh-token" type="password" placeholder="GitHub PAT (with repo access)" class="w-full bg-zinc-800 p-2 mb-4 rounded border border-zinc-700 text-white">
-            <button onclick="saveSettings()" class="w-full py-2 bg-blue-600 rounded font-bold text-white">Save & Close</button>
-        </div>
-    </div>
+    <!-- [own-key] settings modal removed; restore with toggleSettings() if re-enabling own key -->
+    <!-- [own-key] <div id="settings-modal" ...> ... </div> -->
 
     <!-- About modal -->
     <div id="about-modal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-50">
         <div class="bg-zinc-900 p-6 rounded-lg w-full max-w-md border border-zinc-700">
             <div class="flex items-center justify-between mb-5">
-                <h2 class="text-xl font-bold text-white tracking-tight">The Soroboruo Principle</h2>
+                <h2 class="text-xl font-bold text-white tracking-tight">How it works</h2>
                 <button onclick="toggleAbout()" class="text-zinc-400 hover:text-white transition-colors p-1 rounded hover:bg-zinc-800">
                     <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
@@ -108,11 +80,9 @@
                 </button>
             </div>
             <div class="space-y-4 text-sm text-zinc-300 leading-relaxed">
-                <p>The serpent devours its own tail — not in destruction, but in eternal renewal. From its consumption, it is remade.</p>
-                <p>This page is such a serpent. It contains the intelligence to rewrite itself. What you see is both the vessel and the venom — the medium contains the editor to transform the message.</p>
-                <p>Type your intention. Intelligence digests it. The current form is consumed and alchemized into something new. Each transmutation remembers what came before and becomes something it could not have been without it.</p>
-                <p>When the vision is complete, publish it — and the living page updates, shedding its previous skin across the network.</p>
-                <p class="text-zinc-500 italic">That which rewrites itself cannot be said to die.</p>
+                <p>This page is a shared canvas. Anyone can leave their mark on it.</p>
+                <p>Type what you want to change. One thing at a time. If you like the result, publish it and the live page updates for everyone.</p>
+                <p id="about-limit" class="text-zinc-500"></p>
             </div>
         </div>
     </div>
@@ -122,18 +92,35 @@
         let lastPrompt = "";
         let hasUnpublishedChanges = false;
 
-        function triggerSpin() {
-            const svg = document.getElementById('ouroboros-svg');
-            svg.classList.add('spin-fast');
-            // 3 rotations at 0.38s each = ~1.14s, then ease back to slow
-            setTimeout(() => svg.classList.remove('spin-fast'), 1140);
+        const DAILY_LIMIT = 3;
+
+        function getUsageToday() {
+            const today = new Date().toISOString().slice(0, 10);
+            const stored = JSON.parse(localStorage.getItem('usage_today') || '{}');
+            return stored.date === today ? (stored.used || 0) : 0;
+        }
+
+        function incrementUsageToday() {
+            const today = new Date().toISOString().slice(0, 10);
+            localStorage.setItem('usage_today', JSON.stringify({ date: today, used: getUsageToday() + 1 }));
+        }
+
+        function updateRemainingDisplay() {
+            const remaining = DAILY_LIMIT - getUsageToday();
+            const el = document.getElementById('remaining-count');
+            if (remaining <= 0) {
+                el.textContent = 'No contributions remaining today';
+                el.className = 'text-red-400 text-sm';
+            } else {
+                el.textContent = `${remaining} contribution${remaining === 1 ? '' : 's'} remaining today`;
+                el.className = 'text-zinc-400 text-sm';
+            }
         }
 
         function toggleChat() {
             const popup = document.getElementById('chat-popup');
             const isHidden = popup.classList.toggle('hidden');
-            if (!isHidden) checkSettings();
-            triggerSpin();
+            if (!isHidden) updateRemainingDisplay();
         }
 
         function navigateHome() {
@@ -155,36 +142,106 @@
             .catch(() => {});
 
         // UI Logic
-        function toggleAbout() { document.getElementById('about-modal').classList.toggle('hidden'); }
-        function toggleSettings() { document.getElementById('settings-modal').classList.toggle('hidden'); }
-        function saveSettings() {
-            localStorage.setItem('vibe_claude_key', document.getElementById('claude-key').value);
-            localStorage.setItem('vibe_gh_token', document.getElementById('gh-token').value);
-            toggleSettings();
-            checkSettings();
-        }
+        let historyOpen = false;
 
-        function checkSettings() {
-            const settings = [
-                { key: 'vibe_claude_key', label: 'Claude API Key' },
-                { key: 'vibe_gh_token', label: 'GitHub Token' },
-            ];
-            const missing = settings.filter(s => !localStorage.getItem(s.key));
-            const history = document.getElementById('chat-history');
-            history.innerHTML = '';
-            if (missing.length === 0) {
-                const div = document.createElement('div');
-                div.className = 'text-green-400 text-sm';
-                div.textContent = '✓ All settings configured. Ready to vibe.';
-                history.appendChild(div);
-            } else {
-                const div = document.createElement('div');
-                div.className = 'text-yellow-400 text-sm';
-                div.innerHTML = `Missing settings — open Settings to configure:<br>` +
-                    missing.map(s => `&nbsp;&nbsp;• ${s.label}`).join('<br>');
-                history.appendChild(div);
+        function timeAgo(dateStr) {
+            const seconds = Math.floor((Date.now() - new Date(dateStr)) / 1000);
+            if (seconds < 60) return 'just now';
+            const intervals = [[31536000,'y'],[2592000,'mo'],[86400,'d'],[3600,'h'],[60,'m']];
+            for (const [s, label] of intervals) {
+                const n = Math.floor(seconds / s);
+                if (n >= 1) return `${n}${label} ago`;
             }
         }
+
+        async function toggleHistory() {
+            historyOpen = !historyOpen;
+            const panel = document.getElementById('history-panel');
+            const chat = document.getElementById('chat-history');
+            const footer = document.getElementById('chat-footer');
+            const btn = document.getElementById('history-btn');
+
+            if (historyOpen) {
+                chat.classList.add('hidden');
+                footer.classList.add('hidden');
+                panel.classList.remove('hidden');
+                panel.classList.add('flex');
+                btn.classList.add('text-white');
+                btn.classList.remove('text-zinc-400');
+                loadHistory();
+            } else {
+                panel.classList.add('hidden');
+                panel.classList.remove('flex');
+                chat.classList.remove('hidden');
+                footer.classList.remove('hidden');
+                btn.classList.remove('text-white');
+                btn.classList.add('text-zinc-400');
+            }
+        }
+
+        async function loadHistory() {
+            const list = document.getElementById('history-list');
+            list.innerHTML = '<div class="p-4 text-zinc-500 text-sm">Loading...</div>';
+            try {
+                const commits = await githubAPI('/repos/slvtrs/ouroboros/commits?path=content.html&per_page=30', 'GET');
+                if (!Array.isArray(commits) || commits.length === 0) {
+                    list.innerHTML = '<div class="p-4 text-zinc-500 text-sm">No history found.</div>';
+                    return;
+                }
+                list.innerHTML = '';
+                commits.forEach((commit, i) => {
+                    const sha = commit.sha;
+                    const message = commit.commit.message || 'no message';
+                    const date = commit.commit.author.date;
+                    const div = document.createElement('div');
+                    div.className = 'px-4 py-3 hover:bg-zinc-800 cursor-pointer transition-colors';
+                    div.innerHTML = `
+                        <div class="text-white text-sm leading-snug">${message.slice(0, 60)}${message.length > 60 ? '…' : ''}</div>
+                        <div class="text-zinc-500 text-xs mt-0.5">${timeAgo(date)}${i === 0 ? ' · current' : ''}</div>
+                    `;
+                    div.onclick = () => previewCommit(sha, message, div);
+                    list.appendChild(div);
+                });
+            } catch (err) {
+                list.innerHTML = `<div class="p-4 text-red-400 text-sm">${err.message}</div>`;
+            }
+        }
+
+        async function previewCommit(sha, message, el) {
+            // Highlight selected
+            document.querySelectorAll('#history-list > div').forEach(d => d.classList.remove('bg-zinc-800'));
+            el.classList.add('bg-zinc-800');
+
+            try {
+                const file = await githubAPI(`/repos/slvtrs/ouroboros/contents/content.html?ref=${sha}`, 'GET');
+                const html = atob(file.content.replace(/\n/g, ''));
+                currentCode = html;
+                document.getElementById('preview-frame').srcdoc = html;
+                hasUnpublishedChanges = true;
+                document.getElementById('publish-btn').classList.remove('hidden');
+                // Switch back to chat view so publish button is visible
+                historyOpen = true;
+                toggleHistory();
+                addChatMessage('claude', `Previewing: "${message.slice(0, 50)}" — publish to restore it.`);
+            } catch (err) {
+                addChatMessage('error', 'Could not load that version.');
+            }
+        }
+
+        function toggleAbout() {
+            document.getElementById('about-modal').classList.toggle('hidden');
+            document.getElementById('about-limit').textContent = `${DAILY_LIMIT} contributions per day.`;
+        }
+        function toggleSettings() { document.getElementById('settings-modal').classList.toggle('hidden'); }
+        const WORKER_URL = "https://ouroboros-worker.soroboruo.workers.dev/"
+        // "https://soroboruo.workers.dev/"
+
+        // [own-key] function saveSettings() {
+        //     const key = document.getElementById('claude-key').value.trim();
+        //     if (key) localStorage.setItem('vibe_claude_key', key);
+        //     else localStorage.removeItem('vibe_claude_key');
+        //     toggleSettings();
+        // }
 
         document.getElementById('vibe-input').addEventListener('keydown', e => {
             if (e.key === 'Enter' && !e.shiftKey && !e.ctrlKey && !e.altKey) {
@@ -245,51 +302,55 @@
             const prompt = input.value;
             if (!prompt) return;
 
-            const missing = [
-                { key: 'vibe_claude_key', label: 'Claude API Key' },
-            ].filter(s => !localStorage.getItem(s.key));
-            if (missing.length) {
-                addChatMessage('error', `Missing required settings: ${missing.map(s => s.label).join(', ')} — open Settings to configure.`);
-                return;
-            }
-
             lastPrompt = prompt;
             input.value = "";
             btn.disabled = true;
-            btn.innerText = "Claude is vibing...";
+            btn.innerText = "thinking...";
             addChatMessage('user', prompt);
             showThinking();
 
+            // [own-key] const userKey = localStorage.getItem('vibe_claude_key');
+
             try {
-                const response = await fetch("https://api.anthropic.com/v1/messages", {
+                const reqHeaders = {
+                    "content-type": "application/json",
+                };
+                // [own-key] if (userKey) reqHeaders["X-Api-Key"] = userKey;
+
+                const response = await fetch(`${WORKER_URL}/api/transmute`, {
                     method: "POST",
-                    headers: {
-                        "x-api-key": localStorage.getItem('vibe_claude_key'),
-                        "anthropic-version": "2023-06-01",
-                        "content-type": "application/json",
-                        "anthropic-dangerous-direct-browser-access": "true"
-                    },
+                    headers: reqHeaders,
                     body: JSON.stringify({
                         model: "claude-sonnet-4-6",
                         max_tokens: 8000,
-                        system: currentCode
-                            ? `You are a website editor. The user will ask you to modify an existing HTML page.
-Respond ONLY with one or more patches in this exact format — no other text, no markdown fences:
+                        system: `You are a collaborative editor for a shared living webpage. Many different people leave their mark on it over time — each person makes one contribution.
+
+Your job is to fulfill the user's request as a single, coherent patch. A contribution can range from tiny (change one color) to meaningful (convert to dark mode, change the layout) — but it must be ONE unified idea, applied as one patch.
+
+Rules:
+- One patch per response. If the request contains multiple unrelated ideas, pick the most interesting one.
+- Never return full HTML. Never rewrite the whole page from scratch.
+- A patch can touch many lines if they all serve the same idea (e.g. dark mode requires changing multiple colors — that's fine as one patch).
+- Respond ONLY with exactly one patch in this format — no other text, no markdown fences:
 
 <<<FIND>>>
 exact text from the current page to replace (must match exactly, including whitespace)
 <<<REPLACE>>>
 new text to put in its place
-<<<END>>>
-
-You can include multiple patches in sequence. Each patch is applied in order.
-If the user wants a completely new page (not a modification), respond instead with ONLY the full HTML starting with <!DOCTYPE html>.`
-                            : `You are a website builder. Return ONLY the complete HTML source code of a single-file website. Start with <!DOCTYPE html>. Include Tailwind CSS via CDN and any necessary JS inline. No explanations, no markdown fences.`,
+<<<END>>>`,
                         messages: [{ role: "user", content: currentCode ? `Current page:\n${currentCode}\n\nTask: ${prompt}` : `Task: ${prompt}` }]
                     })
                 });
 
                 const data = await response.json();
+                if (response.status === 429) {
+                    hideThinking();
+                    addChatMessage('error', data.error);
+                    updateRemainingDisplay();
+                    btn.disabled = false;
+                    btn.innerText = "Change";
+                    return;
+                }
                 const rawText = data.content[0].text.trim();
 
                 console.log('%c[ouroboros] raw response:', 'color: #a78bfa; font-weight: bold');
@@ -299,45 +360,43 @@ If the user wants a completely new page (not a modification), respond instead wi
                     addChatMessage('error', "Response was cut off (hit token limit) — the preview may be incomplete.");
                 }
 
-                let newCode;
-                if (rawText.includes('<<<FIND>>>')) {
-                    // Patch mode: apply find/replace patches to currentCode
-                    newCode = currentCode;
-                    const patchRegex = /<<<FIND>>>([\s\S]*?)<<<REPLACE>>>([\s\S]*?)<<<END>>>/g;
-                    let match;
-                    let patchCount = 0;
-                    while ((match = patchRegex.exec(rawText)) !== null) {
-                        const find = match[1].trim();
-                        const replace = match[2].trim();
-                        if (newCode.includes(find)) {
-                            newCode = newCode.replace(find, replace);
-                            patchCount++;
-                        } else {
-                            console.warn('[ouroboros] patch FIND text not found:', find);
-                        }
-                    }
-                    if (patchCount === 0) {
-                        hideThinking();
-                        addChatMessage('error', "Couldn't apply patches — no matching text found. Raw response logged to console.");
-                        return;
-                    }
-                } else {
-                    // Full HTML mode
-                    newCode = rawText.replace(/^```[\w]*\n?/, '').replace(/\n?```$/, '').trim();
-                    if (!newCode || !newCode.includes('<')) {
-                        hideThinking();
-                        addChatMessage('error', "Claude didn't return valid HTML or patches — raw response logged to console.");
-                        return;
-                    }
+                // Full HTML rewrites are not allowed — patch only
+                if (!rawText.includes('<<<FIND>>>')) {
+                    hideThinking();
+                    addChatMessage('error', "That change was too large. Try something more focused — one idea at a time.");
+                    return;
                 }
+
+                const patches = [...rawText.matchAll(/<<<FIND>>>([\s\S]*?)<<<REPLACE>>>([\s\S]*?)<<<END>>>/g)];
+
+                if (patches.length > 1) {
+                    hideThinking();
+                    addChatMessage('error', "Only one change at a time. Try being more specific.");
+                    return;
+                }
+
+                const [, find, replace] = patches[0];
+                const findText = find.trim();
+                const replaceText = replace.trim();
+
+                if (!currentCode.includes(findText)) {
+                    hideThinking();
+                    addChatMessage('error', "Couldn't apply the change — try rephrasing your request.");
+                    console.warn('[ouroboros] patch FIND text not found:', findText);
+                    return;
+                }
+
+                const newCode = currentCode.replace(findText, replaceText);
 
                 currentCode = newCode;
                 document.getElementById('preview-frame').srcdoc = currentCode;
                 hasUnpublishedChanges = true;
                 document.getElementById('publish-btn').classList.remove('hidden');
+                incrementUsageToday();
+                updateRemainingDisplay();
                 hideThinking();
                 playChime();
-                addChatMessage('claude', "Updated preview!");
+                addChatMessage('claude', "Done — publish to make it live.");
             } catch (err) {
                 hideThinking();
                 addChatMessage('error', err.message);
@@ -348,30 +407,57 @@ If the user wants a completely new page (not a modification), respond instead wi
         }
 
         // The GitHub Logic
+        // Patterns that should never appear in AI-generated content.html
+        const BLOCKED_PATTERNS = [
+            { re: /WORKER_URL/i,             reason: "references Worker URL" },
+            { re: /GITHUB_PAT/i,             reason: "references GitHub PAT" },
+            { re: /ANTHROPIC_KEY/i,          reason: "references Anthropic key" },
+            { re: /vibe_claude_key/i,        reason: "references localStorage key name" },
+            { re: /vibe_gh_token/i,          reason: "references localStorage key name" },
+            { re: /workers\.dev/i,           reason: "references Worker domain" },
+            { re: /api\.anthropic\.com/i,    reason: "direct Anthropic API call" },
+            { re: /api\.github\.com/i,       reason: "direct GitHub API call" },
+            { re: /localStorage\s*\.\s*getItem\s*\(\s*['"]vibe_/i, reason: "accesses app secrets from localStorage" },
+        ];
+
+        function sanitizeForPublish(html) {
+            for (const { re, reason } of BLOCKED_PATTERNS) {
+                if (re.test(html)) {
+                    return { ok: false, reason };
+                }
+            }
+            if (!html.includes("<") || html.trim().length < 10) {
+                return { ok: false, reason: "doesn't look like valid HTML" };
+            }
+            return { ok: true };
+        }
+
+        async function githubAPI(path, method, body) {
+            const res = await fetch(`${WORKER_URL}/api/publish`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ path, method, body }),
+            });
+            return res.json();
+        }
+
         async function publishToGithub() {
             const btn = document.getElementById('publish-btn');
-            const token = localStorage.getItem('vibe_gh_token');
-            const repo = "slvtrs/ouroboros";
-            
-            if(!currentCode) return alert("Nothing to publish yet!");
-            
+            if (!currentCode) return alert("Nothing to publish yet!");
+
+            const check = sanitizeForPublish(currentCode);
+            if (!check.ok) {
+                addChatMessage('error', `Publish blocked: generated content ${check.reason}. Try regenerating.`);
+                return;
+            }
+
             btn.innerText = "Publishing...";
             try {
-                // Get SHA of content.html
-                const res = await fetch(`https://api.github.com/repos/${repo}/contents/content.html`, {
-                    headers: { "Authorization": `token ${token}` }
-                });
-                const fileData = await res.json();
-
-                // Update File
-                await fetch(`https://api.github.com/repos/${repo}/contents/content.html`, {
-                    method: "PUT",
-                    headers: { "Authorization": `token ${token}`, "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        message: lastPrompt ? lastPrompt.slice(0, 72) : "Vibe update",
-                        content: btoa(unescape(encodeURIComponent(currentCode))), // Fix for special characters
-                        sha: fileData.sha
-                    })
+                const fileData = await githubAPI("/repos/slvtrs/ouroboros/contents/content.html", "GET");
+                await githubAPI("/repos/slvtrs/ouroboros/contents/content.html", "PUT", {
+                    message: lastPrompt ? lastPrompt.slice(0, 72) : "Vibe update",
+                    content: btoa(unescape(encodeURIComponent(currentCode))),
+                    sha: fileData.sha,
                 });
                 hasUnpublishedChanges = false;
                 document.getElementById('publish-btn').classList.add('hidden');
@@ -386,49 +472,26 @@ If the user wants a completely new page (not a modification), respond instead wi
         // Revert last commit
         async function revertLastCommit() {
             const btn = document.getElementById('revert-btn');
-            const token = localStorage.getItem('vibe_gh_token');
-            const repo = "slvtrs/ouroboros";
-
-            if (!token || !repo) return alert("GitHub Token and Repo must be set in Settings.");
             if (!confirm("This will revert content.html to the previous commit and push it. Continue?")) return;
 
             btn.innerText = "Reverting...";
             btn.disabled = true;
             try {
-                // Get the last two commits touching content.html
-                const commitsRes = await fetch(`https://api.github.com/repos/${repo}/commits?path=content.html&per_page=2`, {
-                    headers: { "Authorization": `token ${token}` }
-                });
-                const commits = await commitsRes.json();
+                const commits = await githubAPI("/repos/slvtrs/ouroboros/commits?path=content.html&per_page=2", "GET");
                 if (!commits[1]) return alert("No previous commit to revert to.");
 
                 const prevSha = commits[1].sha;
                 const prevMessage = commits[1].commit.message;
 
-                // Get the file content at that commit
-                const prevFileRes = await fetch(`https://api.github.com/repos/${repo}/contents/content.html?ref=${prevSha}`, {
-                    headers: { "Authorization": `token ${token}` }
-                });
-                const prevFile = await prevFileRes.json();
+                const prevFile = await githubAPI(`/repos/slvtrs/ouroboros/contents/content.html?ref=${prevSha}`, "GET");
+                const currFile = await githubAPI("/repos/slvtrs/ouroboros/contents/content.html", "GET");
 
-                // Get current file SHA (needed for the update)
-                const currFileRes = await fetch(`https://api.github.com/repos/${repo}/contents/content.html`, {
-                    headers: { "Authorization": `token ${token}` }
-                });
-                const currFile = await currFileRes.json();
-
-                // Push the old content as a new commit
-                await fetch(`https://api.github.com/repos/${repo}/contents/content.html`, {
-                    method: "PUT",
-                    headers: { "Authorization": `token ${token}`, "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        message: `Revert to: ${prevMessage}`,
-                        content: prevFile.content.replace(/\n/g, ''),
-                        sha: currFile.sha
-                    })
+                await githubAPI("/repos/slvtrs/ouroboros/contents/content.html", "PUT", {
+                    message: `Revert to: ${prevMessage}`,
+                    content: prevFile.content.replace(/\n/g, ''),
+                    sha: currFile.sha,
                 });
 
-                // Update local preview and code to match
                 const reverted = atob(prevFile.content.replace(/\n/g, ''));
                 currentCode = reverted;
                 document.getElementById('preview-frame').srcdoc = reverted;

@@ -1,0 +1,7 @@
+name = "ouroboros-worker"
+main = "worker.js"
+compatibility_date = "2024-01-01"
+
+[[kv_namespaces]]
+binding = "RATE_LIMIT_KV"
+id = "5d3e24ed985b4a469c8f017a5438b454"
