@@ -6,10 +6,10 @@
   <title>Cat</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@700;800&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Comic+Neue:wght@700&display=swap');
     body {
       background: #008080;
-      font-family: 'Nunito', 'Arial Rounded MT Bold', sans-serif;
+      font-family: 'Comic Neue', 'Comic Sans MS', cursive;
       overflow-x: hidden;
     }
     .cat-body { animation: bounce 0.6s infinite alternate ease-in-out; }
@@ -22,6 +22,54 @@
     .banner { animation: wiggle 0.5s infinite alternate; transform-origin: center; }
     .paw-l { animation: paw 0.5s infinite alternate; transform-origin: 240px 380px; }
     .paw-r { animation: paw 0.5s infinite alternate reverse; transform-origin: 340px 380px; }
+
+    .orbit-group {
+      animation: orbit 3s linear infinite;
+      transform-origin: 290px 280px;
+    }
+    .orbit-group-reverse {
+      animation: orbit-reverse 4s linear infinite;
+      transform-origin: 290px 280px;
+    }
+    .orbit-group-slow {
+      animation: orbit 5.5s linear infinite;
+      transform-origin: 290px 280px;
+    }
+
+    @keyframes orbit {
+      from { transform: rotate(0deg); }
+      to   { transform: rotate(360deg); }
+    }
+    @keyframes orbit-reverse {
+      from { transform: rotate(0deg); }
+      to   { transform: rotate(-360deg); }
+    }
+    /* Counter-rotate the mice so they stay upright */
+    .mouse-upright {
+      animation: counter-orbit 3s linear infinite;
+      transform-origin: 290px 280px;
+    }
+    .mouse-upright-reverse {
+      animation: counter-orbit-reverse 4s linear infinite;
+      transform-origin: 290px 280px;
+    }
+    .mouse-upright-slow {
+      animation: counter-orbit-slow 5.5s linear infinite;
+      transform-origin: 290px 280px;
+    }
+    @keyframes counter-orbit {
+      from { transform: rotate(0deg); }
+      to   { transform: rotate(-360deg); }
+    }
+    @keyframes counter-orbit-reverse {
+      from { transform: rotate(0deg); }
+      to   { transform: rotate(360deg); }
+    }
+    @keyframes counter-orbit-slow {
+      from { transform: rotate(0deg); }
+      to   { transform: rotate(-360deg); }
+    }
+
     @keyframes bounce {
       from { transform: translateY(0px); }
       to   { transform: translateY(-18px); }
@@ -102,6 +150,79 @@
     <!-- Sparkle 4 -->
     <g class="sparkle4">
       <polygon points="460,358 463,368 473,370 463,372 460,382 457,372 447,370 457,368" fill="#ADFF2F" stroke="#228B22" stroke-width="1"/>
+    </g>
+
+    <!-- ========== ORBITING MICE (behind cat) ========== -->
+
+    <!-- Mouse 1: fast orbit, starts at top -->
+    <g class="orbit-group">
+      <g transform="translate(290, 110)">
+        <g class="mouse-upright">
+          <!-- tail -->
+          <line x1="0" y1="10" x2="18" y2="22" stroke="#bbb" stroke-width="2" stroke-linecap="round"/>
+          <!-- body -->
+          <ellipse cx="0" cy="0" rx="12" ry="9" fill="#aaa" stroke="#666" stroke-width="1"/>
+          <!-- head -->
+          <ellipse cx="-10" cy="-4" rx="8" ry="7" fill="#aaa" stroke="#666" stroke-width="1"/>
+          <!-- ear left -->
+          <ellipse cx="-16" cy="-9" rx="4" ry="4" fill="#aaa" stroke="#666" stroke-width="1"/>
+          <ellipse cx="-16" cy="-9" rx="2.5" ry="2.5" fill="#ffb6c1"/>
+          <!-- ear right -->
+          <ellipse cx="-8" cy="-10" rx="4" ry="4" fill="#aaa" stroke="#666" stroke-width="1"/>
+          <ellipse cx="-8" cy="-10" rx="2.5" ry="2.5" fill="#ffb6c1"/>
+          <!-- eye -->
+          <circle cx="-13" cy="-5" r="2" fill="#111"/>
+          <circle cx="-12" cy="-6" r="0.7" fill="white"/>
+          <!-- nose -->
+          <ellipse cx="-18" cy="-2" rx="1.5" ry="1" fill="#ff69b4"/>
+          <!-- whiskers -->
+          <line x1="-18" y1="-2" x2="-24" y2="-4" stroke="#666" stroke-width="0.8"/>
+          <line x1="-18" y1="-2" x2="-24" y2="-1" stroke="#666" stroke-width="0.8"/>
+          <line x1="-18" y1="-2" x2="-24" y2="1" stroke="#666" stroke-width="0.8"/>
+        </g>
+      </g>
+    </g>
+
+    <!-- Mouse 2: reverse orbit, starts at right -->
+    <g class="orbit-group-reverse">
+      <g transform="translate(450, 280)">
+        <g class="mouse-upright-reverse">
+          <line x1="0" y1="10" x2="-18" y2="22" stroke="#cc9" stroke-width="2" stroke-linecap="round"/>
+          <ellipse cx="0" cy="0" rx="13" ry="10" fill="#d4a96a" stroke="#8B6914" stroke-width="1"/>
+          <ellipse cx="11" cy="-4" rx="9" ry="8" fill="#d4a96a" stroke="#8B6914" stroke-width="1"/>
+          <ellipse cx="17" cy="-10" rx="4.5" ry="4.5" fill="#d4a96a" stroke="#8B6914" stroke-width="1"/>
+          <ellipse cx="17" cy="-10" rx="2.8" ry="2.8" fill="#ffb6c1"/>
+          <ellipse cx="8" cy="-11" rx="4.5" ry="4.5" fill="#d4a96a" stroke="#8B6914" stroke-width="1"/>
+          <ellipse cx="8" cy="-11" rx="2.8" ry="2.8" fill="#ffb6c1"/>
+          <circle cx="13" cy="-5" r="2.2" fill="#111"/>
+          <circle cx="14" cy="-6" r="0.8" fill="white"/>
+          <ellipse cx="19" cy="-2" rx="1.8" ry="1.2" fill="#ff69b4"/>
+          <line x1="19" y1="-2" x2="26" y2="-4" stroke="#8B6914" stroke-width="0.8"/>
+          <line x1="19" y1="-2" x2="26" y2="-1" stroke="#8B6914" stroke-width="0.8"/>
+          <line x1="19" y1="-2" x2="26" y2="2" stroke="#8B6914" stroke-width="0.8"/>
+        </g>
+      </g>
+    </g>
+
+    <!-- Mouse 3: slow orbit, starts at bottom-left -->
+    <g class="orbit-group-slow">
+      <g transform="translate(150, 350)">
+        <g class="mouse-upright-slow">
+          <line x1="0" y1="10" x2="15" y2="24" stroke="#99c" stroke-width="2" stroke-linecap="round"/>
+          <ellipse cx="0" cy="0" rx="11" ry="8" fill="#9b8fc7" stroke="#5a4d8a" stroke-width="1"/>
+          <ellipse cx="-9" cy="-3" rx="7.5" ry="6.5" fill="#9b8fc7" stroke="#5a4d8a" stroke-width="1"/>
+          <ellipse cx="-14" cy="-8" rx="4" ry="4" fill="#9b8fc7" stroke="#5a4d8a" stroke-width="1"/>
+          <ellipse cx="-14" cy="-8" rx="2.5" ry="2.5" fill="#ffb6c1"/>
+          <ellipse cx="-7" cy="-9" rx="4" ry="4" fill="#9b8fc7" stroke="#5a4d8a" stroke-width="1"/>
+          <ellipse cx="-7" cy="-9" rx="2.5" ry="2.5" fill="#ffb6c1"/>
+          <circle cx="-12" cy="-4" r="2" fill="#111"/>
+          <circle cx="-11" cy="-5" r="0.7" fill="white"/>
+          <ellipse cx="-16" cy="-1" rx="1.5" ry="1" fill="#ff69b4"/>
+          <line x1="-16" y1="-1" x2="-22" y2="-3" stroke="#5a4d8a" stroke-width="0.8"/>
+          <line x1="-16" y1="-1" x2="-22" y2="0" stroke="#5a4d8a" stroke-width="0.8"/>
+          <line x1="-16" y1="-1" x2="-22" y2="2" stroke="#5a4d8a" stroke-width="0.8"/>
+        </g>
+      </g>
     </g>
 
     <!-- CAT GROUP (bounces) -->
