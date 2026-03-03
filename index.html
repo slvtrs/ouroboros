@@ -230,6 +230,21 @@
             cancelEvents.forEach(e => window.addEventListener(e, cancel, { once: true }));
         }
 
+        // Poll for live updates every 20s — direct static fetch, no worker/API involved
+        setInterval(async () => {
+            if (hasUnpublishedChanges) return;
+            if (!document.getElementById('preview-footer').classList.contains('hidden')) return;
+            try {
+                const r = await fetch('content.html');
+                const html = await r.text();
+                if (html && html.includes('<') && html !== currentCode) {
+                    currentCode = html;
+                    document.getElementById('preview-frame').srcdoc = html;
+                    playUpdateChime();
+                }
+            } catch(e) {}
+        }, 20000);
+
         // UI Logic
         let historyOpen = false;
         let aboutOpen = false;
@@ -429,6 +444,25 @@
         function hideThinking() {
             const el = document.getElementById('thinking-indicator');
             if (el) el.remove();
+        }
+
+        function playUpdateChime() {
+            const ctx = new (window.AudioContext || window.webkitAudioContext)();
+            const notes = [528, 396]; // C5 → G4, soft descending
+            notes.forEach((freq, i) => {
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.type = 'sine';
+                osc.frequency.value = freq;
+                const start = ctx.currentTime + i * 0.18;
+                gain.gain.setValueAtTime(0, start);
+                gain.gain.linearRampToValueAtTime(0.10, start + 0.02);
+                gain.gain.exponentialRampToValueAtTime(0.0001, start + 0.9);
+                osc.start(start);
+                osc.stop(start + 0.9);
+            });
         }
 
         function playChime() {
