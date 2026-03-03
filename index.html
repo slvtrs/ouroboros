@@ -631,8 +631,11 @@ Rules:
 
             const sig = document.getElementById('signature-input').value.trim();
             if (sig) localStorage.setItem('contributor_sig', sig);
-            const base = lastPrompt ? lastPrompt.slice(0, 60) : "vibe update";
-            const commitMessage = sig ? `${sig}: ${base}` : base;
+            const prompt = lastPrompt || "vibe update";
+            const subject = sig ? `${sig}: ${prompt.slice(0, 60)}` : prompt.slice(0, 72);
+            const commitMessage = prompt.length > (sig ? 60 : 72)
+                ? `${subject}…\n\n${prompt}`
+                : subject;
 
             btn.disabled = true;
             btn.innerText = "Publishing...";
