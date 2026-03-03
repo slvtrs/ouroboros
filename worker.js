@@ -3,13 +3,17 @@ const ALLOWED_ORIGINS = [
     "https://slvtrs.github.io",
     "https://vibecadaver.slvtrs.com",
 ];
+let ENFORCE_ALLOWED_ORIGINS = true; 
+ ENFORCE_ALLOWED_ORIGINS = false; // uncomment to enable local dev
 
 function corsHeaders(requestOrigin) {
-    const origin = ALLOWED_ORIGINS.includes(requestOrigin) ? requestOrigin : ALLOWED_ORIGINS[0];
+    const origin = !ENFORCE_ALLOWED_ORIGINS ? "*"
+        : ALLOWED_ORIGINS.includes(requestOrigin) ? requestOrigin : ALLOWED_ORIGINS[0];
     return {
         "Access-Control-Allow-Origin": origin,
         "Access-Control-Allow-Methods": "POST, OPTIONS",
-        "Access-Control-Allow-Headers": "Content-Type, X-Api-Key",
+        "Access-Control-Allow-Headers": "Content-Type, X-Api-Key, X-Retry",
+        "Access-Control-Expose-Headers": "X-Remaining-Today",
     };
 }
 
@@ -27,11 +31,20 @@ export default {
         const referer = request.headers.get("Referer") || "";
         const originOk = ALLOWED_ORIGINS.includes(origin);
         const refererOk = ALLOWED_ORIGINS.some(o => referer.startsWith(o));
-        if (!originOk && !refererOk) {
+        if (ENFORCE_ALLOWED_ORIGINS && !originOk && !refererOk) {
             return new Response(null, { status: 403 });
         }
 
         const url = new URL(request.url);
+
+        if (request.method === "GET" && url.pathname === "/api/status") {
+            const ip = request.headers.get("CF-Connecting-IP") || "unknown";
+            const today = new Date().toISOString().slice(0, 10);
+            const used = parseInt((await env.RATE_LIMIT_KV.get(`rl:${ip}:${today}`)) || "0");
+            return new Response(JSON.stringify({ remaining: Math.max(0, DAILY_LIMIT - used) }), {
+                headers: { "Content-Type": "application/json", ...corsHeaders(origin) },
+            });
+        }
 
         if (request.method === "POST" && url.pathname === "/api/transmute") {
             return handleTransmute(request, env, origin);
@@ -72,15 +85,31 @@ async function handleTransmute(request, env, origin) {
     const today = new Date().toISOString().slice(0, 10); // "YYYY-MM-DD"
     const kvKey = `rl:${ip}:${today}`;
 
+    // X-Retry: true means the client's patch failed — reuse the same rate-limit slot,
+    // so retries bypass the rate limit check entirely.
+    const isRetry = request.headers.get("X-Retry") === "true";
+
     const current = parseInt((await env.RATE_LIMIT_KV.get(kvKey)) || "0");
-    if (current >= DAILY_LIMIT) {
+    if (!isRetry && current >= DAILY_LIMIT) {
         return new Response(
-            JSON.stringify({ error: `Daily limit of ${DAILY_LIMIT} free edits reached. Add your own Anthropic key in Settings for unlimited use.` }),
+            JSON.stringify({ error: `You've used all ${DAILY_LIMIT} contributions for today. Come back tomorrow.` }),
             { status: 429, headers: { "Content-Type": "application/json", ...corsHeaders(origin) } }
         );
     }
 
-    const body = await request.text();
+    let body;
+    if (isRetry) {
+        const { currentCode, prompt } = await request.json();
+        body = JSON.stringify({
+            model: "claude-sonnet-4-6",
+            max_tokens: 16000,
+            system: "You are editing a webpage. Return ONLY the complete modified HTML starting with <!DOCTYPE html>. No markdown, no explanation, nothing else.",
+            messages: [{ role: "user", content: `Current page:\n${currentCode}\n\nChange: ${prompt}` }]
+        });
+    } else {
+        body = await request.text();
+    }
+
     const upstream = await fetch("https://api.anthropic.com/v1/messages", {
         method: "POST",
         headers: {
@@ -91,15 +120,19 @@ async function handleTransmute(request, env, origin) {
         body,
     });
 
-    if (upstream.ok) {
-        // Increment counter, expire at end of day (86400s max, good enough)
+    // Only increment counter on the first attempt, not retries
+    if (upstream.ok && !isRetry) {
         await env.RATE_LIMIT_KV.put(kvKey, String(current + 1), { expirationTtl: 86400 });
     }
 
     const data = await upstream.text();
     return new Response(data, {
         status: upstream.status,
-        headers: { "Content-Type": "application/json", ...corsHeaders(origin) },
+        headers: {
+            "Content-Type": "application/json",
+            "X-Remaining-Today": String(Math.max(0, DAILY_LIMIT - (current + 1))),
+            ...corsHeaders(origin)
+        },
     });
 }
 
@@ -133,6 +166,7 @@ async function handlePublish(request, env, origin) {
         headers: {
             "Authorization": `token ${env.GITHUB_PAT}`,
             "Content-Type": "application/json",
+            "User-Agent": "vibecadaver-worker",
         },
         body: body ? JSON.stringify(body) : undefined,
     });
