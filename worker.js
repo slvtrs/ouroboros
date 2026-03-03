@@ -4,7 +4,7 @@ const ALLOWED_ORIGINS = [
     "https://vibecadaver.slvtrs.com",
 ];
 let ENFORCE_ALLOWED_ORIGINS = true; 
- ENFORCE_ALLOWED_ORIGINS = false; // uncomment to enable local dev
+ // ENFORCE_ALLOWED_ORIGINS = false; // uncomment to enable local dev
 
 function corsHeaders(requestOrigin) {
     const origin = !ENFORCE_ALLOWED_ORIGINS ? "*"

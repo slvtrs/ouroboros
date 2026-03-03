@@ -210,8 +210,8 @@
         const savedSig = localStorage.getItem('contributor_sig');
         if (savedSig) document.getElementById('signature-input').value = savedSig;
 
-        // Seed currentCode on page load (iframe already renders via src=, so no iframe update needed)
-        loadFreshContent({ updateIframe: false });
+        // Seed currentCode and update iframe via b64decode to guarantee correct UTF-8 rendering
+        loadFreshContent({ updateIframe: true });
 
         // UI Logic
         let historyOpen = false;
@@ -700,21 +700,21 @@ Rules:
         }
 
         async function loadFreshContent({ updateIframe = true } = {}) {
-            // Try direct fetch first (fast, works on deployed site)
+            // GitHub API first — b64decode + TextDecoder guarantees correct UTF-8 (emojis, etc.)
             try {
-                const r = await fetch('content.html');
-                const html = await r.text();
-                if (html && html.includes('<')) {
+                const file = await githubAPI('/repos/slvtrs/ouroboros/contents/content.html', 'GET');
+                if (file?.content) {
+                    const html = b64decode(file.content);
                     currentCode = html;
                     if (updateIframe) document.getElementById('preview-frame').srcdoc = html;
                     return;
                 }
             } catch(e) {}
-            // Fallback: GitHub API (works everywhere, always returns exact source)
+            // Fallback: direct fetch (if GitHub API is unavailable)
             try {
-                const file = await githubAPI('/repos/slvtrs/ouroboros/contents/content.html', 'GET');
-                if (file?.content) {
-                    const html = b64decode(file.content);
+                const r = await fetch('content.html');
+                const html = await r.text();
+                if (html && html.includes('<')) {
                     currentCode = html;
                     if (updateIframe) document.getElementById('preview-frame').srcdoc = html;
                 }
