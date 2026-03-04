@@ -544,24 +544,22 @@
 
 The CURRENT PAGE SOURCE is provided in full at the start of the user message. You already have everything you need — never ask for clarification, never ask for the source, never explain your reasoning. Just make the change silently.
 
-Your job is to make ONE focused change. Choose the best format:
-
-OPTION A — Patch (for simple, locatable changes):
+Output ONLY one or more patches in this exact format:
 <<<FIND>>>
-exact verbatim text copied character-for-character from the source HTML above
+exact verbatim text copied character-for-character from the source HTML
 <<<REPLACE>>>
 new text
 <<<END>>>
 
-OPTION B — Full page rewrite (for visual changes, SVG edits, or anything complex):
-Return ONLY the complete modified HTML starting with <!DOCTYPE html>. No markdown, no explanation.
+You may emit multiple <<<FIND>>>…<<<END>>> blocks if the same change must appear in several places.
 
 Rules:
-- ONE change only.
-- No conversation, no commentary, no questions. Output ONLY the patch or the full HTML — nothing else.
-- CRITICAL for Option A: The <<<FIND>>> block MUST be a literal substring that appears in the HTML source above. Do NOT invent property names, CSS syntax, or JavaScript notation. The source is HTML/SVG — look for actual attributes like fill="#CC0000", not made-up syntax like eyes: '#333'. If you cannot find an exact verbatim match in the source, use Option B instead.
-- Use Option B for any visual change (colors, sizes, positions, animations) or any SVG edit, since those are easiest to get right with a full rewrite.
-- ALWAYS produce output. If the request is ambiguous, make your best creative guess. An imperfect change is always better than no change.`,
+- ONE logical change only — do not refactor or restructure anything beyond what was asked.
+- No conversation, no commentary, no questions. Output ONLY patch blocks — nothing else.
+- The <<<FIND>>> text MUST be a verbatim substring from the source. Copy it character-for-character — whitespace, quotes, and all. Do NOT invent attributes or syntax.
+- For colour, size, or animation changes: find the exact attribute value in the SVG/CSS and patch just that value.
+- If you genuinely cannot find a unique verbatim anchor, expand the <<<FIND>>> block to include more surrounding context until it is unique.
+- ALWAYS produce a patch. If the request is ambiguous, make your best creative guess. An imperfect patch is always better than no output.`,
                         messages: [{ role: "user", content: currentCode ? `Current page:\n${currentCode}\n\nTask: ${prompt}` : `Task: ${prompt}` }]
                     })
                 });
@@ -593,64 +591,31 @@ Rules:
                 }
 
                 // Loose patch delimiter — tolerate <, <<, <<< and mixed case
-                const hasPatch = /<<+\s*find\s*>>+/i.test(rawText);
+                const patchRegex = /<<+\s*find\s*>>+([\s\S]*?)<<+\s*replace\s*>>+([\s\S]*?)<<+\s*end\s*>>+/gi;
+                const patches = [...rawText.matchAll(patchRegex)];
 
-                // Try to extract any HTML block from the response (used as last resort)
-                function extractHTML(text) {
-                    const stripped = text.replace(/^```[\w]*\n?/m, '').replace(/\n?```$/m, '').trim();
-                    // Look for full page
-                    const idx = stripped.search(/<!DOCTYPE|<html/i);
-                    if (idx !== -1) return stripped.slice(idx);
-                    // Look for any partial HTML fragment and graft it in
-                    const fragmentIdx = stripped.search(/<(div|style|body|head|span|section|svg)/i);
-                    if (fragmentIdx !== -1) {
-                        // Wrap fragment into the existing page as a best-effort injection
-                        return currentCode.replace('</body>', stripped.slice(fragmentIdx) + '\n</body>');
-                    }
-                    return null;
+                if (patches.length === 0) {
+                    hideThinking();
+                    addChatMessage('error', "Couldn't apply that — try rephrasing with more specific detail.");
+                    return;
                 }
 
-                let newCode;
-                if (hasPatch) {
-                    const patchRegex = /<<+\s*find\s*>>+([\s\S]*?)<<+\s*replace\s*>>+([\s\S]*?)<<+\s*end\s*>>+/gi;
-                    const patches = [...rawText.matchAll(patchRegex)];
-                    newCode = currentCode;
-                    let applied = 0;
-                    const appliedPatches = [];
-                    for (const [, find, replace] of patches) {
-                        const result = applyPatch(newCode, find.trim(), replace.trim());
-                        if (result) { newCode = result; applied++; appliedPatches.push({ find: find.trim(), replace: replace.trim() }); }
-                        else console.warn('[ouroboros] patch not applied:', find.trim());
-                    }
-                    if (applied === 0) {
-                        lastPatches = null; // falling back to full rewrite
-                        // Patches all failed — try HTML in same response first
-                        const html = extractHTML(rawText);
-                        if (html) {
-                            newCode = html;
-                        } else {
-                            // Silent server-side retry — free, same contribution slot
-                            console.log('[ouroboros] patch failed, requesting full HTML rewrite...');
-                            const retryRes = await fetch(`${WORKER_URL}/api/transmute`, {
-                                method: "POST",
-                                headers: { ...reqHeaders, "X-Retry": "true" },
-                                body: JSON.stringify({ currentCode, prompt })
-                            });
-                            const retryData = await retryRes.json();
-                            console.log('%c[ouroboros] retry response:', 'color: #34d399; font-weight: bold', retryRes.status, retryData);
-                            const retryHTML = extractHTML(retryData?.content?.[0]?.text || '');
-                            if (retryHTML) { newCode = retryHTML; }
-                            else { hideThinking(); addChatMessage('error', "Couldn't quite do that one — try rephrasing."); return; }
-                        }
-                    } else {
-                        lastPatches = appliedPatches;
-                    }
-                } else {
-                    lastPatches = null; // full HTML rewrite
-                    const html = extractHTML(rawText);
-                    if (html) { newCode = html; }
-                    else { hideThinking(); addChatMessage('error', "Couldn't quite do that one — try rephrasing."); return; }
+                let newCode = currentCode;
+                let applied = 0;
+                const appliedPatches = [];
+                for (const [, find, replace] of patches) {
+                    const result = applyPatch(newCode, find.trim(), replace.trim());
+                    if (result) { newCode = result; applied++; appliedPatches.push({ find: find.trim(), replace: replace.trim() }); }
+                    else console.warn('[ouroboros] patch not applied:', find.trim());
                 }
+
+                if (applied === 0) {
+                    hideThinking();
+                    addChatMessage('error', "Couldn't locate that part of the page — try being more specific.");
+                    return;
+                }
+
+                lastPatches = appliedPatches;
 
                 originalCode = currentCode;
                 currentCode = newCode;
