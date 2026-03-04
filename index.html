@@ -306,10 +306,14 @@
                 panel.classList.add('hidden');
                 panel.classList.remove('flex');
                 chat.classList.remove('hidden');
-                // Don't restore chat footer if still previewing a historical commit
-                if (document.getElementById('preview-footer').classList.contains('hidden')) {
-                    footer.classList.remove('hidden');
+                // If a commit was being previewed, restore current content and clean up
+                const previewFooter = document.getElementById('preview-footer');
+                if (!previewFooter.classList.contains('hidden')) {
+                    previewFooter.classList.add('hidden');
+                    document.querySelectorAll('#history-list > div').forEach(d => d.classList.remove('bg-zinc-800'));
+                    if (currentCode) document.getElementById('preview-frame').srcdoc = currentCode;
                 }
+                if (!hasUnpublishedChanges) footer.classList.remove('hidden');
                 btn.classList.remove('text-white');
                 btn.classList.add('text-zinc-400');
                 title.classList.add('hidden');
@@ -352,16 +356,15 @@
             try {
                 const file = await githubAPI(`/repos/slvtrs/ouroboros/contents/content.html?ref=${sha}`, 'GET');
                 const html = b64decode(file.content);
-                // Show historical version in iframe but don't overwrite currentCode
                 document.getElementById('preview-frame').srcdoc = html;
-                // Close history, show preview footer only
-                historyOpen = true;
-                toggleHistory();
-                document.getElementById('chat-footer').classList.add('hidden');
+                // Stay in history view, just reveal the exit button at the bottom
                 document.getElementById('preview-footer').classList.remove('hidden');
-                addChatMessage('claude', `Previewing: "${message.slice(0, 50)}"`);
             } catch (err) {
-                addChatMessage('error', 'Could not load that version.');
+                const list = document.getElementById('history-list');
+                const errDiv = document.createElement('div');
+                errDiv.className = 'px-4 py-2 text-red-400 text-xs';
+                errDiv.textContent = 'Could not load that version.';
+                list.prepend(errDiv);
             }
         }
 
@@ -370,12 +373,16 @@
             if (currentCode) {
                 frame.srcdoc = currentCode;
             } else {
-                // currentCode not yet loaded — reload the live file
                 frame.removeAttribute('srcdoc');
                 frame.src = 'content.html';
             }
             document.getElementById('preview-footer').classList.add('hidden');
-            document.getElementById('chat-footer').classList.remove('hidden');
+            // Deselect any highlighted commit
+            document.querySelectorAll('#history-list > div').forEach(d => d.classList.remove('bg-zinc-800'));
+            // Only restore chat footer if not in history view
+            if (!historyOpen) {
+                document.getElementById('chat-footer').classList.remove('hidden');
+            }
         }
 
         function toggleAbout() {
