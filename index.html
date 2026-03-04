@@ -75,7 +75,7 @@
 <body class="h-screen bg-white overflow-hidden">
 
     <!-- Full-screen preview -->
-    <iframe id="preview-frame" src="content.html" class="w-full h-full border-none block"></iframe>
+    <iframe id="preview-frame" class="w-full h-full border-none block"></iframe>
 
     <!-- Floating contribute button -->
     <button onclick="toggleChat()" id="edit-btn"
@@ -163,6 +163,7 @@
         let hasUnpublishedChanges = false;
         let lastPatches = null; // [{find, replace}] for patch-based edits; null for full rewrites
         let lastKnownSha = null;
+        const isLocal = location.protocol === 'file:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1';
 
         const DAILY_LIMIT = 3;
 
@@ -248,6 +249,7 @@
 
         // Poll for live updates every 20s via GitHub API (avoids stale CDN cache on GitHub Pages)
         setInterval(async () => {
+            if (isLocal) return;
             if (hasUnpublishedChanges) return;
             if (!document.getElementById('preview-footer').classList.contains('hidden')) return;
             try {
@@ -255,9 +257,11 @@
                 if (file?.sha && file.sha !== lastKnownSha && file?.content) {
                     const html = b64decode(file.content);
                     lastKnownSha = file.sha;
-                    currentCode = html;
-                    document.getElementById('preview-frame').srcdoc = html;
-                    playUpdateChime();
+                    if (html !== currentCode) {
+                        currentCode = html;
+                        document.getElementById('preview-frame').srcdoc = html;
+                        playUpdateChime();
+                    }
                 }
             } catch(e) {}
         }, 20000);
@@ -375,8 +379,7 @@
             if (currentCode) {
                 frame.srcdoc = currentCode;
             } else {
-                frame.removeAttribute('srcdoc');
-                frame.src = 'content.html';
+                loadFreshContent({ updateIframe: true });
             }
             document.getElementById('preview-footer').classList.add('hidden');
             // Deselect any highlighted commit
@@ -798,18 +801,25 @@ Rules:
         }
 
         async function loadFreshContent({ updateIframe = true } = {}) {
-            // GitHub API first — b64decode + TextDecoder guarantees correct UTF-8 (emojis, etc.)
-            try {
-                const file = await githubAPI('/repos/slvtrs/ouroboros/contents/content.html', 'GET');
-                if (file?.content) {
-                    const html = b64decode(file.content);
-                    lastKnownSha = file.sha || null;
-                    currentCode = html;
-                    if (updateIframe) document.getElementById('preview-frame').srcdoc = html;
-                    return;
-                }
-            } catch(e) {}
-            // Fallback: direct fetch with cache: 'no-store' to bypass browser cache
+            // GitHub API first (skipped locally to avoid CORS errors from the worker)
+            if (!isLocal) {
+                try {
+                    const file = await githubAPI('/repos/slvtrs/ouroboros/contents/content.html', 'GET');
+                    if (file?.content) {
+                        const html = b64decode(file.content);
+                        lastKnownSha = file.sha || null;
+                        currentCode = html;
+                        if (updateIframe) document.getElementById('preview-frame').srcdoc = html;
+                        return;
+                    }
+                } catch(e) {}
+            }
+            // Local dev on file:// — fetch() is blocked by CORS, use iframe.src directly
+            if (location.protocol === 'file:') {
+                if (updateIframe) document.getElementById('preview-frame').src = 'content.html';
+                return;
+            }
+            // Fallback: direct fetch (works on http://localhost)
             try {
                 const r = await fetch('content.html', { cache: 'no-store' });
                 const html = await r.text();

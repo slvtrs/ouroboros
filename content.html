@@ -239,6 +239,19 @@
       <rect x="248" y="390" width="84" height="20" rx="5" fill="#c4547a" stroke="#8b2a50" stroke-width="1.5"/>
       <text x="290" y="404" text-anchor="middle" font-family="'Cormorant Garamond',Georgia,serif" font-size="11" font-style="italic" fill="white">Meow-ster</text>
 
+      <!-- WIZARD HAT -->
+      <!-- Hat brim -->
+      <ellipse cx="290" cy="222" rx="72" ry="14" fill="#2a0a4a" stroke="#7b2fa0" stroke-width="2"/>
+      <!-- Hat cone -->
+      <polygon points="290,60 218,222 362,222" fill="#3a0a6a" stroke="#7b2fa0" stroke-width="2"/>
+      <!-- Hat band -->
+      <rect x="222" y="208" width="136" height="16" rx="4" fill="#7b2fa0" stroke="#c47aff" stroke-width="1.5"/>
+      <!-- Star on hat -->
+      <polygon points="290,100 294,113 308,113 297,121 301,134 290,126 279,134 283,121 272,113 286,113" fill="#ffd700" stroke="#c4a000" stroke-width="1"/>
+      <!-- Small stars on hat -->
+      <polygon points="245,150 247,156 253,156 248,160 250,166 245,162 240,166 242,160 237,156 243,156" fill="#c4a0ff" stroke="#9b70cc" stroke-width="0.8"/>
+      <polygon points="335,160 337,166 343,166 338,170 340,176 335,172 330,176 332,170 327,166 333,166" fill="#c4a0ff" stroke="#9b70cc" stroke-width="0.8"/>
+
       <!-- TOAST popping out left slot -->
       <rect x="220" y="200" width="32" height="62" rx="4" fill="#e8c87a" stroke="#b8860b" stroke-width="2"/>
       <rect x="224" y="204" width="24" height="42" rx="2" fill="#d4a040" opacity="0.7"/>
@@ -306,6 +319,158 @@
       </p>
     </div>
   </div>
+
+  <!-- Music toggle button -->
+  <style>
+    #music-btn {
+      position: fixed;
+      bottom: 18px;
+      right: 18px;
+      z-index: 1000;
+      background: #1e0d1a;
+      border: 1px solid #c4547a;
+      color: #c4547a;
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-style: italic;
+      font-size: 0.85rem;
+      letter-spacing: 0.12em;
+      padding: 6px 14px;
+      border-radius: 20px;
+      cursor: pointer;
+      opacity: 0.85;
+      transition: opacity 0.2s;
+    }
+    #music-btn:hover { opacity: 1; }
+  </style>
+  <button id="music-btn" onclick="toggleMusic()">♪ play music</button>
+  <script>
+    (function() {
+      // Raw Web Audio API — no external library, works on iOS
+      const AC = window.AudioContext || window.webkitAudioContext;
+      let ctx = null, masterGain = null;
+      let playing = false, stepTimer = null;
+
+      // Fm – Db – Ab – Eb (synthwave classic), freqs in Hz
+      const chords = [
+        [174.61, 207.65, 261.63, 311.13], // Fm
+        [138.59, 174.61, 207.65, 261.63], // Db
+        [103.83, 155.56, 207.65, 261.63], // Ab
+        [155.56, 196.00, 233.08, 277.18], // Eb
+      ];
+      const bassFreqs = [87.31, 69.30, 51.91, 77.78]; // F1 Db1 Ab1 Eb1
+      const melFreqs  = [
+        [698.46, 523.25, 415.30, 622.25],
+        [554.37, 415.30, 349.23, 415.30],
+        [415.30, 523.25, 622.25, 523.25],
+        [622.25, 466.16, 392.00, 466.16],
+      ];
+
+      let chordIdx = 0, melBar = 0, melNote = 0;
+      let padOscs = [];
+
+      function note(freq, type, startT, dur, peakGain, attack, release) {
+        const osc = ctx.createOscillator();
+        const env = ctx.createGain();
+        osc.type = type;
+        osc.frequency.value = freq;
+        env.gain.setValueAtTime(0, startT);
+        env.gain.linearRampToValueAtTime(peakGain, startT + attack);
+        osc.connect(env);
+        env.connect(masterGain);
+        osc.start(startT); // must call start before stop
+        if (dur > 0) {
+          env.gain.setValueAtTime(peakGain, startT + dur - release);
+          env.gain.linearRampToValueAtTime(0, startT + dur);
+          osc.stop(startT + dur + 0.05);
+        }
+        return { osc, env };
+      }
+
+      function releaseOscs(oscs) {
+        const now = ctx.currentTime;
+        oscs.forEach(({ osc, env }) => {
+          try {
+            env.gain.cancelScheduledValues(now);
+            env.gain.setValueAtTime(env.gain.value, now);
+            env.gain.linearRampToValueAtTime(0, now + 1.5);
+            osc.stop(now + 1.6);
+          } catch(e) {}
+        });
+      }
+
+      function step() {
+        const now = ctx.currentTime + 0.05; // small buffer for iOS scheduling
+        const beat = 60 / 80; // 80 BPM
+        const bar  = beat * 4;
+
+        // Pad chord — new chord every 2 bars
+        releaseOscs(padOscs);
+        padOscs = chords[chordIdx % 4].map(f => note(f, 'sawtooth', now, 0, 0.10, 1.0, 1.5));
+        // bass
+        note(bassFreqs[chordIdx % 4], 'triangle', now,       bar, 0.22, 0.04, 0.3);
+        note(bassFreqs[chordIdx % 4], 'triangle', now + bar, bar, 0.18, 0.04, 0.3);
+        // melody — 8 eighth notes over 2 bars
+        for (let i = 0; i < 8; i++) {
+          const mf = melFreqs[melBar % 4][(melNote + i) % 4];
+          note(mf, 'triangle', now + i * beat * 0.5, beat * 0.45, 0.06, 0.05, 0.1);
+        }
+        melNote = (melNote + 8) % 4;
+        if (melNote === 0) melBar++;
+        chordIdx++;
+      }
+
+      window._startMusic = function(existingCtx) {
+        if (playing) return;
+        ctx = existingCtx || ctx || new AC();
+        masterGain = ctx.createGain();
+        masterGain.gain.value = 1;
+        masterGain.connect(ctx.destination);
+        playing = true;
+        step();
+        stepTimer = setInterval(step, (60 / 80) * 4 * 2 * 1000); // every 2 bars
+      };
+
+      window._stopMusic = function() {
+        playing = false;
+        clearInterval(stepTimer);
+        releaseOscs(padOscs);
+        padOscs = [];
+        chordIdx = 0; melBar = 0; melNote = 0;
+      };
+    })();
+
+    function toggleMusic() {
+      const btn = document.getElementById('music-btn');
+      if (btn.dataset.playing === 'true') {
+        window._stopMusic && window._stopMusic();
+        btn.textContent = '♪ play music';
+        btn.dataset.playing = 'false';
+        return;
+      }
+      btn.dataset.playing = 'true';
+      btn.textContent = '♫ pause music';
+
+      // iOS silent mode workaround: playing HTML5 audio inside a user gesture switches the
+      // AVAudioSession category to "playback", letting Web Audio bypass the ringer switch.
+      // Build a valid 1-sample silent WAV via Blob so iOS treats it as real audio content.
+      var wav = new Uint8Array([
+        82,73,70,70, 38,0,0,0, 87,65,86,69,        // RIFF....WAVE
+        102,109,116,32, 16,0,0,0, 1,0, 1,0,         // fmt  PCM mono
+        68,172,0,0, 136,88,1,0, 2,0, 16,0,           // 44100Hz 88200bps 2ba 16bit
+        100,97,116,97, 2,0,0,0, 0,0                  // data + 1 silent sample
+      ]);
+      var blobUrl = URL.createObjectURL(new Blob([wav], {type:'audio/wav'}));
+      var ua = new Audio(blobUrl);
+      ua.play().catch(function(){});
+      ua.onended = function(){ URL.revokeObjectURL(blobUrl); };
+
+      var AC = window.AudioContext || window.webkitAudioContext;
+      var ctx = new AC();
+      ctx.resume().then(function() {
+        if (typeof window._startMusic === 'function') window._startMusic(ctx);
+      });
+    }
+  </script>
 
   <script>
     // Slow colour drift on the tagline
