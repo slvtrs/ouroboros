@@ -162,6 +162,7 @@
         let lastPrompt = "";
         let hasUnpublishedChanges = false;
         let lastPatches = null; // [{find, replace}] for patch-based edits; null for full rewrites
+        let lastKnownSha = null;
 
         const DAILY_LIMIT = 3;
 
@@ -245,14 +246,15 @@
             cancelEvents.forEach(e => window.addEventListener(e, cancel, { once: true }));
         }
 
-        // Poll for live updates every 20s — direct static fetch, no worker/API involved
+        // Poll for live updates every 20s via GitHub API (avoids stale CDN cache on GitHub Pages)
         setInterval(async () => {
             if (hasUnpublishedChanges) return;
             if (!document.getElementById('preview-footer').classList.contains('hidden')) return;
             try {
-                const r = await fetch('content.html');
-                const html = await r.text();
-                if (html && html.includes('<') && html !== currentCode) {
+                const file = await githubAPI('/repos/slvtrs/ouroboros/contents/content.html', 'GET');
+                if (file?.sha && file.sha !== lastKnownSha && file?.content) {
+                    const html = b64decode(file.content);
+                    lastKnownSha = file.sha;
                     currentCode = html;
                     document.getElementById('preview-frame').srcdoc = html;
                     playUpdateChime();
@@ -801,14 +803,15 @@ Rules:
                 const file = await githubAPI('/repos/slvtrs/ouroboros/contents/content.html', 'GET');
                 if (file?.content) {
                     const html = b64decode(file.content);
+                    lastKnownSha = file.sha || null;
                     currentCode = html;
                     if (updateIframe) document.getElementById('preview-frame').srcdoc = html;
                     return;
                 }
             } catch(e) {}
-            // Fallback: direct fetch (if GitHub API is unavailable)
+            // Fallback: direct fetch with cache: 'no-store' to bypass browser cache
             try {
-                const r = await fetch('content.html');
+                const r = await fetch('content.html', { cache: 'no-store' });
                 const html = await r.text();
                 if (html && html.includes('<')) {
                     currentCode = html;
