@@ -8,7 +8,7 @@
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&display=swap');
     body {
-      background: #120810;
+      background: #90ff90;
       font-family: 'Cormorant Garamond', Georgia, serif;
       overflow-x: hidden;
       color: #d4b0c4;
@@ -218,7 +218,45 @@
     <g class="cat-body">
 
       <!-- TOASTER BODY — mermaid scales base -->
-      <rect x="170" y="240" width="240" height="170" rx="18" fill="#0a6e7a" stroke="#05c8d8" stroke-width="3"/>
+      <style>
+        @keyframes checker-flash {
+          0%   { fill: #ff0000; }
+          12%  { fill: #ff8800; }
+          25%  { fill: #ffff00; }
+          37%  { fill: #00ff00; }
+          50%  { fill: #0088ff; }
+          62%  { fill: #8800ff; }
+          75%  { fill: #ff00ff; }
+          87%  { fill: #ff0088; }
+          100% { fill: #ff0000; }
+        }
+        @keyframes checker-flash-alt {
+          0%   { fill: #0088ff; }
+          12%  { fill: #8800ff; }
+          25%  { fill: #ff00ff; }
+          37%  { fill: #ff0088; }
+          50%  { fill: #ff0000; }
+          62%  { fill: #ff8800; }
+          75%  { fill: #ffff00; }
+          87%  { fill: #00ff00; }
+          100% { fill: #0088ff; }
+        }
+        .checker-a { animation: checker-flash 0.4s steps(1) infinite; }
+        .checker-b { animation: checker-flash-alt 0.4s steps(1) infinite; }
+      </style>
+      <defs>
+        <pattern id="checkerPattern" x="0" y="0" width="40" height="40" patternUnits="userSpaceOnUse">
+          <rect class="checker-a" x="0" y="0" width="20" height="20"/>
+          <rect class="checker-b" x="20" y="0" width="20" height="20"/>
+          <rect class="checker-b" x="0" y="20" width="20" height="20"/>
+          <rect class="checker-a" x="20" y="20" width="20" height="20"/>
+        </pattern>
+        <clipPath id="toasterBodyClip">
+          <rect x="170" y="240" width="240" height="170" rx="18"/>
+        </clipPath>
+      </defs>
+      <rect x="170" y="240" width="240" height="170" rx="18" fill="url(#checkerPattern)" stroke="#05c8d8" stroke-width="3"/>
+      <rect x="170" y="240" width="240" height="170" rx="18" fill="none" clip-path="url(#toasterBodyClip)" stroke="#05c8d8" stroke-width="3"/>
       <!-- Scale pattern overlay -->
       <clipPath id="toasterClip">
         <rect x="170" y="240" width="240" height="170" rx="18"/>
