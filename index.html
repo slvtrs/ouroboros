@@ -15,6 +15,15 @@
         .thinking-dot { animation: thinking-bounce 1.2s infinite ease-in-out; }
         .thinking-dot:nth-child(2) { animation-delay: 0.2s; }
         .thinking-dot:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes btn-pulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(255,255,255,0.3), 0 10px 40px rgba(0,0,0,0.4); }
+            50%       { box-shadow: 0 0 0 10px rgba(255,255,255,0), 0 10px 40px rgba(0,0,0,0.4); }
+        }
+        @keyframes btn-pulse-light {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(0,0,0,0.25), 0 4px 16px rgba(0,0,0,0.15); }
+            50%       { box-shadow: 0 0 0 10px rgba(0,0,0,0), 0 4px 16px rgba(0,0,0,0.15); }
+        }
+        #edit-btn { animation: btn-pulse 4s ease-out infinite; }
         @keyframes popup-in {
             from { opacity: 0; transform: translateY(10px) scale(0.97); }
             to   { opacity: 1; transform: translateY(0)    scale(1); }
@@ -30,6 +39,7 @@
             background-color: #ffffff !important;
             color: #09090b !important;
             border-color: #d4d4d8 !important;
+            animation: btn-pulse-light 4s ease-out infinite !important;
         }
         #chat-popup {
             background-color: #ffffff !important;
@@ -69,7 +79,7 @@
 
     <!-- Floating contribute button -->
     <button onclick="toggleChat()" id="edit-btn"
-        class="fixed bottom-6 left-1/2 -translate-x-1/2 sm:left-6 sm:translate-x-0 px-5 py-3 bg-zinc-900 text-white text-sm font-bold tracking-widest rounded-full shadow-xl z-40 border border-zinc-700 opacity-40 hover:opacity-100 transition-opacity">
+        class="fixed bottom-6 left-1/2 -translate-x-1/2 sm:left-6 sm:translate-x-0 px-5 py-3 bg-zinc-900 text-white text-sm font-bold tracking-widest rounded-full shadow-xl z-40 border border-zinc-700 hover:bg-zinc-800 active:scale-95 transition-all">
         CONTRIBUTE
     </button>
 
