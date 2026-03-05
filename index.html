@@ -253,7 +253,7 @@
             if (hasUnpublishedChanges) return;
             if (!document.getElementById('preview-footer').classList.contains('hidden')) return;
             try {
-                const file = await githubAPI('/repos/slvtrs/ouroboros/contents/content.html', 'GET');
+                const file = await githubAPI(`/repos/slvtrs/ouroboros/contents/content.html?t=${Date.now()}`, 'GET');
                 if (file?.sha && file.sha !== lastKnownSha && file?.content) {
                     const html = b64decode(file.content);
                     lastKnownSha = file.sha;
@@ -804,7 +804,7 @@ Rules:
             // GitHub API first (skipped locally to avoid CORS errors from the worker)
             if (!isLocal) {
                 try {
-                    const file = await githubAPI('/repos/slvtrs/ouroboros/contents/content.html', 'GET');
+                    const file = await githubAPI(`/repos/slvtrs/ouroboros/contents/content.html?t=${Date.now()}`, 'GET');
                     if (file?.content) {
                         const html = b64decode(file.content);
                         lastKnownSha = file.sha || null;
