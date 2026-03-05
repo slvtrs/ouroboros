@@ -812,22 +812,68 @@
       let playing = false, stepTimer = null;
 
       // Fm – Db – Ab – Eb (synthwave classic), freqs in Hz
-      const chords = [
-        [174.61, 207.65, 261.63, 311.13], // Fm
-        [138.59, 174.61, 207.65, 261.63], // Db
-        [103.83, 155.56, 207.65, 261.63], // Ab
-        [155.56, 196.00, 233.08, 277.18], // Eb
-      ];
-      const bassFreqs = [87.31, 69.30, 51.91, 77.78]; // F1 Db1 Ab1 Eb1
-      const melFreqs  = [
-        [698.46, 523.25, 415.30, 622.25],
-        [554.37, 415.30, 349.23, 415.30],
-        [415.30, 523.25, 622.25, 523.25],
-        [622.25, 466.16, 392.00, 466.16],
+      // Wedding March (Here Comes the Bride) chime melody
+      // Notes: G G G Eb / G Eb G | Bb Bb Bb G / Bb G Bb
+      // Frequencies in Hz
+      const weddingMelody = [
+        // Bar 1: Here comes the bride
+        { f: 392.00, dur: 0.45 }, // G4
+        { f: 392.00, dur: 0.15 }, // G4
+        { f: 392.00, dur: 0.45 }, // G4
+        { f: 311.13, dur: 0.90 }, // Eb4
+        // Bar 2
+        { f: 392.00, dur: 0.45 }, // G4
+        { f: 311.13, dur: 0.45 }, // Eb4
+        { f: 392.00, dur: 0.90 }, // G4
+        // Bar 3
+        { f: 493.88, dur: 0.45 }, // B4
+        { f: 493.88, dur: 0.15 }, // B4
+        { f: 493.88, dur: 0.45 }, // B4
+        { f: 392.00, dur: 0.90 }, // G4
+        // Bar 4
+        { f: 493.88, dur: 0.45 }, // B4
+        { f: 392.00, dur: 0.45 }, // G4
+        { f: 493.88, dur: 0.90 }, // B4
       ];
 
-      let chordIdx = 0, melBar = 0, melNote = 0;
+      // Pad chords: C G Am Em (wedding-ish major)
+      const chords = [
+        [261.63, 329.63, 392.00, 523.25], // C
+        [196.00, 246.94, 293.66, 392.00], // G
+        [220.00, 261.63, 329.63, 440.00], // Am
+        [164.81, 196.00, 246.94, 329.63], // Em
+      ];
+      const bassFreqs = [130.81, 98.00, 110.00, 82.41]; // C2 G2 A2 E2
+
+      let chordIdx = 0, melNoteIdx = 0;
       let padOscs = [];
+
+      function chime(freq, startT, dur) {
+        // Bell-like chime: sine with fast attack, slow exponential decay
+        const osc = ctx.createOscillator();
+        const osc2 = ctx.createOscillator();
+        const env = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.value = freq;
+        osc2.type = 'sine';
+        osc2.frequency.value = freq * 2.756; // inharmonic partial for bell timbre
+        const env2 = ctx.createGain();
+        osc2.connect(env2);
+        env2.gain.setValueAtTime(0, startT);
+        env2.gain.linearRampToValueAtTime(0.04, startT + 0.01);
+        env2.gain.exponentialRampToValueAtTime(0.0001, startT + dur * 0.6);
+        env2.connect(masterGain);
+        osc2.start(startT);
+        osc2.stop(startT + dur + 0.05);
+
+        env.gain.setValueAtTime(0, startT);
+        env.gain.linearRampToValueAtTime(0.13, startT + 0.01);
+        env.gain.exponentialRampToValueAtTime(0.0001, startT + dur);
+        osc.connect(env);
+        env.connect(masterGain);
+        osc.start(startT);
+        osc.stop(startT + dur + 0.05);
+      }
 
       function note(freq, type, startT, dur, peakGain, attack, release) {
         const osc = ctx.createOscillator();
@@ -838,7 +884,7 @@
         env.gain.linearRampToValueAtTime(peakGain, startT + attack);
         osc.connect(env);
         env.connect(masterGain);
-        osc.start(startT); // must call start before stop
+        osc.start(startT);
         if (dur > 0) {
           env.gain.setValueAtTime(peakGain, startT + dur - release);
           env.gain.linearRampToValueAtTime(0, startT + dur);
@@ -860,23 +906,25 @@
       }
 
       function step() {
-        const now = ctx.currentTime + 0.05; // small buffer for iOS scheduling
-        const beat = 60 / 80; // 80 BPM
+        const now = ctx.currentTime + 0.05;
+        const beat = 60 / 72; // 72 BPM — stately wedding pace
         const bar  = beat * 4;
 
-        // Pad chord — new chord every 2 bars
+        // Soft pad chord sustain
         releaseOscs(padOscs);
-        padOscs = chords[chordIdx % 4].map(f => note(f, 'sawtooth', now, 0, 0.10, 1.0, 1.5));
-        // bass
-        note(bassFreqs[chordIdx % 4], 'triangle', now,       bar, 0.22, 0.04, 0.3);
-        note(bassFreqs[chordIdx % 4], 'triangle', now + bar, bar, 0.18, 0.04, 0.3);
-        // melody — 8 eighth notes over 2 bars
-        for (let i = 0; i < 8; i++) {
-          const mf = melFreqs[melBar % 4][(melNote + i) % 4];
-          note(mf, 'triangle', now + i * beat * 0.5, beat * 0.45, 0.06, 0.05, 0.1);
+        padOscs = chords[chordIdx % 4].map(f => note(f, 'sine', now, 0, 0.04, 1.2, 1.5));
+
+        // Bass note, gentle
+        note(bassFreqs[chordIdx % 4], 'sine', now, bar * 2, 0.10, 0.08, 0.5);
+
+        // Schedule chime melody notes over 2 bars
+        let t = now;
+        for (let i = 0; i < 7; i++) {
+          const nm = weddingMelody[(melNoteIdx + i) % weddingMelody.length];
+          chime(nm.f, t, nm.dur * 2.2);
+          t += nm.dur * (beat / 0.45);
         }
-        melNote = (melNote + 8) % 4;
-        if (melNote === 0) melBar++;
+        melNoteIdx = (melNoteIdx + 7) % weddingMelody.length;
         chordIdx++;
       }
 
@@ -884,11 +932,11 @@
         if (playing) return;
         ctx = existingCtx || ctx || new AC();
         masterGain = ctx.createGain();
-        masterGain.gain.value = 1;
+        masterGain.gain.value = 0.85;
         masterGain.connect(ctx.destination);
         playing = true;
         step();
-        stepTimer = setInterval(step, (60 / 80) * 4 * 2 * 1000); // every 2 bars
+        stepTimer = setInterval(step, (60 / 72) * 4 * 2 * 1000); // every 2 bars
       };
 
       window._stopMusic = function() {
