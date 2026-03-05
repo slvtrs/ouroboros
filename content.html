@@ -14,10 +14,23 @@
     body {
       background: url('https://upload.wikimedia.org/wikipedia/commons/6/68/Joe_Biden_presidential_portrait.jpg') repeat fixed;
       background-size: 120px 120px;
+      background-color: #0a0008;
       animation: font-swap 1.5s steps(1) infinite;
       font-family: 'Comic Sans MS', 'Comic Sans', cursive;
       overflow: hidden;
       color: #d4b0c4;
+    }
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: rgba(10, 0, 8, 0.4);
+      pointer-events: none;
+      z-index: 0;
+    }
+    body > * {
+      position: relative;
+      z-index: 1;
     }
     .cat-body { animation: bounce 0.6s infinite alternate ease-in-out; }
     .tail { animation: wag 0.4s infinite alternate ease-in-out; transform-origin: 420px 310px; }
