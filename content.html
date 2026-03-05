@@ -553,49 +553,138 @@
       <text x="445" y="130" text-anchor="middle" font-family="'Cormorant Garamond',Georgia,serif" font-size="13" font-style="italic" fill="#d4b0c4">come here ♥</text>
     </g>
 
-    <!-- Hopscotch grid (Japan scene) -->
-    <g transform="translate(10, 30)">
-      <!-- Ground -->
-      <rect x="0" y="390" width="130" height="12" rx="3" fill="#e8c96a" stroke="#b89030" stroke-width="1"/>
-      <!-- Mount Fuji silhouette -->
-      <polygon points="65,355 35,390 95,390" fill="#cce0ff" stroke="#aac0ee" stroke-width="1"/>
-      <polygon points="65,355 54,368 76,368" fill="white" opacity="0.85"/>
-      <!-- Sun (hinomaru) -->
-      <circle cx="110" cy="358" r="9" fill="#cc0000" opacity="0.85"/>
-      <!-- Hopscotch squares -->
-      <rect x="42" y="375" width="22" height="16" rx="2" fill="none" stroke="#cc0000" stroke-width="1.5"/>
-      <text x="53" y="387" text-anchor="middle" font-family="monospace" font-size="7" fill="#cc0000">1</text>
-      <rect x="30" y="359" width="20" height="15" rx="2" fill="none" stroke="#cc0000" stroke-width="1.5"/>
-      <text x="40" y="370" text-anchor="middle" font-family="monospace" font-size="7" fill="#cc0000">2</text>
-      <rect x="51" y="359" width="20" height="15" rx="2" fill="none" stroke="#cc0000" stroke-width="1.5"/>
-      <text x="61" y="370" text-anchor="middle" font-family="monospace" font-size="7" fill="#cc0000">3</text>
-      <rect x="40" y="343" width="22" height="15" rx="2" fill="none" stroke="#cc0000" stroke-width="1.5"/>
-      <text x="51" y="354" text-anchor="middle" font-family="monospace" font-size="7" fill="#cc0000">4</text>
-      <!-- Jalapeño character — body -->
-      <ellipse cx="51" cy="336" rx="7" ry="11" fill="#3aaa22" stroke="#1a7a00" stroke-width="1.2" transform="rotate(-15,51,336)"/>
-      <!-- Jalapeño stem -->
-      <path d="M54,325 Q57,318 60,316" fill="none" stroke="#1a7a00" stroke-width="1.5" stroke-linecap="round"/>
-      <!-- Jalapeño shine -->
-      <ellipse cx="48" cy="332" rx="2.5" ry="4" fill="white" opacity="0.3" transform="rotate(-15,48,332)"/>
-      <!-- Jalapeño face -->
-      <circle cx="49" cy="334" r="1.2" fill="#111"/>
-      <circle cx="54" cy="333" r="1.2" fill="#111"/>
-      <path d="M50,338 Q52,340 54,338" fill="none" stroke="#111" stroke-width="0.9" stroke-linecap="round"/>
-      <!-- Little legs mid-hop -->
-      <line x1="48" y1="344" x2="44" y2="352" stroke="#1a7a00" stroke-width="1.5" stroke-linecap="round"/>
-      <line x1="54" y1="344" x2="60" y2="349" stroke="#1a7a00" stroke-width="1.5" stroke-linecap="round"/>
-      <!-- Tiny arms -->
-      <line x1="46" y1="335" x2="41" y2="331" stroke="#1a7a00" stroke-width="1.2" stroke-linecap="round"/>
-      <line x1="56" y1="334" x2="61" y2="330" stroke="#1a7a00" stroke-width="1.2" stroke-linecap="round"/>
-      <!-- Protest sign stick -->
-      <line x1="61" y1="330" x2="72" y2="310" stroke="#8B5E3C" stroke-width="1.5" stroke-linecap="round"/>
-      <!-- Protest sign board -->
-      <rect x="63" y="298" width="38" height="22" rx="2" fill="#fff9c4" stroke="#cc0000" stroke-width="1.2"/>
-      <text x="82" y="307" text-anchor="middle" font-family="monospace" font-size="5" font-weight="bold" fill="#cc0000">RIGHTS FOR</text>
-      <text x="82" y="314" text-anchor="middle" font-family="monospace" font-size="5" font-weight="bold" fill="#cc0000">JALAPEÑOS</text>
-      <text x="82" y="319" text-anchor="middle" font-family="monospace" font-size="4" fill="#555">🌶️ NOW!</text>
-      <!-- Japanese text label -->
-      <text x="65" y="400" text-anchor="middle" font-family="serif" font-size="8" fill="#cc0000" opacity="0.9">日本</text>
+    <!-- Friendship scene: Jalapeño + Capybara, large and central, below the toaster -->
+    <style>
+      @keyframes heartbeat {
+        0%, 100% { transform: scale(1); }
+        15% { transform: scale(1.3); }
+        30% { transform: scale(1.05); }
+        45% { transform: scale(1.25); }
+        60% { transform: scale(1); }
+      }
+      @keyframes friend-sway-l {
+        0%, 100% { transform: rotate(-4deg); }
+        50% { transform: rotate(2deg); }
+      }
+      @keyframes friend-sway-r {
+        0%, 100% { transform: rotate(4deg); }
+        50% { transform: rotate(-2deg); }
+      }
+      @keyframes sparkle-pop {
+        0%, 100% { opacity: 0; transform: scale(0.5); }
+        50% { opacity: 1; transform: scale(1.2); }
+      }
+      .friend-jalapeno { animation: friend-sway-l 2s ease-in-out infinite; transform-origin: 148px 390px; }
+      .friend-capy { animation: friend-sway-r 2s ease-in-out infinite; transform-origin: 270px 390px; }
+      .friendship-heart { animation: heartbeat 1.2s ease-in-out infinite; transform-origin: 210px 340px; }
+      .fsp1 { animation: sparkle-pop 1.4s ease-in-out infinite 0s; transform-origin: 158px 305px; }
+      .fsp2 { animation: sparkle-pop 1.4s ease-in-out infinite 0.45s; transform-origin: 265px 308px; }
+      .fsp3 { animation: sparkle-pop 1.4s ease-in-out infinite 0.9s; transform-origin: 210px 295px; }
+    </style>
+
+    <g transform="translate(30, 460)">
+
+      <!-- Shared glow background -->
+      <ellipse cx="178" cy="-60" rx="130" ry="80" fill="#ffe8f0" opacity="0.13"/>
+
+      <!-- ===== JALAPEÑO (left) ===== -->
+      <g class="friend-jalapeno">
+        <!-- Body -->
+        <ellipse cx="118" cy="-60" rx="28" ry="44" fill="#3aaa22" stroke="#1a7a00" stroke-width="2.5" transform="rotate(-10,118,-60)"/>
+        <!-- Shine -->
+        <ellipse cx="108" cy="-72" rx="8" ry="16" fill="white" opacity="0.28" transform="rotate(-10,108,-72)"/>
+        <!-- Stem -->
+        <path d="M126,-100 Q134,-118 140,-124" fill="none" stroke="#1a7a00" stroke-width="3.5" stroke-linecap="round"/>
+        <!-- Leaf curl -->
+        <path d="M134,-116 Q148,-120 145,-108" fill="#2acc10" stroke="#1a7a00" stroke-width="1.5"/>
+        <!-- Eyes — happy squint -->
+        <path d="M107,-68 Q111,-64 115,-68" fill="none" stroke="#111" stroke-width="2.5" stroke-linecap="round"/>
+        <path d="M120,-66 Q124,-62 128,-66" fill="none" stroke="#111" stroke-width="2.5" stroke-linecap="round"/>
+        <!-- Rosy cheek -->
+        <ellipse cx="105" cy="-58" rx="5" ry="3.5" fill="#ff6a6a" opacity="0.4"/>
+        <ellipse cx="130" cy="-57" rx="5" ry="3.5" fill="#ff6a6a" opacity="0.4"/>
+        <!-- Big warm smile -->
+        <path d="M108,-52 Q118,-43 128,-52" fill="none" stroke="#111" stroke-width="2.2" stroke-linecap="round"/>
+        <!-- Legs -->
+        <line x1="108" y1="-18" x2="96" y2="4" stroke="#1a7a00" stroke-width="4" stroke-linecap="round"/>
+        <line x1="128" y1="-18" x2="138" y2="4" stroke="#1a7a00" stroke-width="4" stroke-linecap="round"/>
+        <!-- Feet -->
+        <ellipse cx="93" cy="8" rx="9" ry="5" fill="#1a7a00"/>
+        <ellipse cx="141" cy="8" rx="9" ry="5" fill="#1a7a00"/>
+        <!-- Right arm reaching toward capybara -->
+        <line x1="138" y1="-55" x2="168" y2="-72" stroke="#1a7a00" stroke-width="4" stroke-linecap="round"/>
+        <!-- Left arm (friendly wave up) -->
+        <line x1="98" y1="-58" x2="76" y2="-78" stroke="#1a7a00" stroke-width="4" stroke-linecap="round"/>
+        <circle cx="74" cy="-80" r="6" fill="#3aaa22" stroke="#1a7a00" stroke-width="1.5"/>
+      </g>
+
+      <!-- ===== CAPYBARA (right) ===== -->
+      <g class="friend-capy">
+        <!-- Body -->
+        <ellipse cx="268" cy="-48" rx="52" ry="38" fill="#b8864e" stroke="#7a5520" stroke-width="2"/>
+        <!-- Head -->
+        <ellipse cx="228" cy="-78" rx="38" ry="32" fill="#c49a60" stroke="#7a5520" stroke-width="2"/>
+        <!-- Snout -->
+        <ellipse cx="210" cy="-64" rx="22" ry="15" fill="#d4aa78" stroke="#7a5520" stroke-width="1.5"/>
+        <!-- Nostrils -->
+        <ellipse cx="203" cy="-63" rx="4" ry="3" fill="#5a3010"/>
+        <ellipse cx="217" cy="-63" rx="4" ry="3" fill="#5a3010"/>
+        <!-- Happy closed eyes (crescents) -->
+        <path d="M212,-84 Q218,-78 224,-84" fill="none" stroke="#2a1a08" stroke-width="3" stroke-linecap="round"/>
+        <path d="M232,-84 Q238,-78 244,-84" fill="none" stroke="#2a1a08" stroke-width="3" stroke-linecap="round"/>
+        <!-- Rosy cheeks -->
+        <ellipse cx="208" cy="-74" rx="8" ry="5" fill="#ff8888" opacity="0.4"/>
+        <ellipse cx="246" cy="-74" rx="8" ry="5" fill="#ff8888" opacity="0.4"/>
+        <!-- Big smile -->
+        <path d="M200,-58 Q210,-50 220,-58" fill="none" stroke="#5a3010" stroke-width="2.5" stroke-linecap="round"/>
+        <!-- Ears -->
+        <ellipse cx="206" cy="-104" rx="13" ry="10" fill="#c49a60" stroke="#7a5520" stroke-width="1.5"/>
+        <ellipse cx="206" cy="-104" rx="7" ry="5.5" fill="#e8c090" opacity="0.7"/>
+        <ellipse cx="248" cy="-106" rx="13" ry="10" fill="#c49a60" stroke="#7a5520" stroke-width="1.5"/>
+        <ellipse cx="248" cy="-106" rx="7" ry="5.5" fill="#e8c090" opacity="0.7"/>
+        <!-- Left arm reaching toward jalapeño -->
+        <ellipse cx="222" cy="-42" rx="14" ry="9" fill="#b8864e" stroke="#7a5520" stroke-width="1.5" transform="rotate(-40,222,-42)"/>
+        <circle cx="210" cy="-60" r="8" fill="#c49a60" stroke="#7a5520" stroke-width="1.5"/>
+        <!-- Right arm/paw resting -->
+        <ellipse cx="308" cy="-40" rx="14" ry="9" fill="#b8864e" stroke="#7a5520" stroke-width="1.5" transform="rotate(20,308,-40)"/>
+        <!-- Legs -->
+        <ellipse cx="245" cy="-14" rx="18" ry="12" fill="#b8864e" stroke="#7a5520" stroke-width="1.5"/>
+        <ellipse cx="290" cy="-12" rx="18" ry="12" fill="#b8864e" stroke="#7a5520" stroke-width="1.5"/>
+        <!-- Tiny tail -->
+        <ellipse cx="318" cy="-52" rx="9" ry="7" fill="#c49a60" stroke="#7a5520" stroke-width="1"/>
+        <!-- Fur lines -->
+        <line x1="258" y1="-58" x2="254" y2="-42" stroke="#9a6a30" stroke-width="1" opacity="0.5"/>
+        <line x1="270" y1="-55" x2="270" y2="-38" stroke="#9a6a30" stroke-width="1" opacity="0.5"/>
+        <line x1="282" y1="-58" x2="286" y2="-42" stroke="#9a6a30" stroke-width="1" opacity="0.5"/>
+      </g>
+
+      <!-- Clasped hands / touching point between them -->
+      <ellipse cx="178" cy="-68" rx="11" ry="8" fill="#d4aa78" stroke="#7a5520" stroke-width="1.5" opacity="0.95"/>
+      <ellipse cx="168" cy="-70" rx="7" ry="6" fill="#3aaa22" stroke="#1a7a00" stroke-width="1.2" opacity="0.95"/>
+
+      <!-- BIG SHARED HEART -->
+      <g class="friendship-heart">
+        <path d="M210,-355 C210,-370 190,-378 190,-362 C190,-346 210,-332 210,-332 C210,-332 230,-346 230,-362 C230,-378 210,-370 210,-355 Z"
+              fill="#ff4477" stroke="#cc0044" stroke-width="2" opacity="0.95"/>
+        <!-- Shine on heart -->
+        <ellipse cx="200" cy="-365" rx="5" ry="7" fill="white" opacity="0.35" transform="rotate(-20,200,-365)"/>
+      </g>
+
+      <!-- Sparkle accents -->
+      <g class="fsp1">
+        <polygon points="158,-312 160,-306 166,-305 160,-303 158,-297 156,-303 150,-305 156,-306" fill="#ffcc00" stroke="#ff8800" stroke-width="0.8"/>
+      </g>
+      <g class="fsp2">
+        <polygon points="265,-315 267,-309 273,-308 267,-306 265,-300 263,-306 257,-308 263,-309" fill="#ff88cc" stroke="#cc0066" stroke-width="0.8"/>
+      </g>
+      <g class="fsp3">
+        <polygon points="210,-302 212,-296 218,-295 212,-293 210,-287 208,-293 202,-295 208,-296" fill="#ff4477" stroke="#cc0044" stroke-width="0.8"/>
+      </g>
+
+      <!-- Speech banner between them -->
+      <rect x="138" y="-290" width="144" height="26" rx="10" fill="#fff9e8" stroke="#ffaa00" stroke-width="1.5" opacity="0.95"/>
+      <text x="210" y="-273" text-anchor="middle" font-family="'Cormorant Garamond',Georgia,serif" font-size="13" font-style="italic" fill="#7a4400">best friends forever 🌶️🤝🐾</text>
+
     </g>
 
   </svg>
