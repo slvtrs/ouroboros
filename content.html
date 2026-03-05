@@ -467,6 +467,69 @@
       <line x1="395" y1="325" x2="308" y2="331" stroke="#888" stroke-width="1.5"/>
       <line x1="397" y1="336" x2="308" y2="337" stroke="#888" stroke-width="1.5"/>
 
+      <!-- Mickey mouse arms -->
+      <g class="paw-l">
+        <!-- Left arm -->
+        <path d="M170,310 Q140,320 130,340" fill="none" stroke="#0a8a9a" stroke-width="10" stroke-linecap="round"/>
+        <!-- Left glove -->
+        <circle cx="126" cy="346" r="18" fill="white" stroke="#0a6e7a" stroke-width="2"/>
+        <line x1="112" y1="340" x2="120" y2="352" stroke="#888" stroke-width="1.5"/>
+        <line x1="116" y1="336" x2="122" y2="350" stroke="#888" stroke-width="1.5"/>
+        <line x1="121" y1="334" x2="125" y2="349" stroke="#888" stroke-width="1.5"/>
+      </g>
+      <g class="paw-r">
+        <!-- Right arm -->
+        <path d="M410,310 Q440,320 450,340" fill="none" stroke="#0a8a9a" stroke-width="10" stroke-linecap="round"/>
+        <!-- Right glove -->
+        <circle cx="454" cy="346" r="18" fill="white" stroke="#0a6e7a" stroke-width="2"/>
+        <line x1="468" y1="340" x2="460" y2="352" stroke="#888" stroke-width="1.5"/>
+        <line x1="464" y1="336" x2="458" y2="350" stroke="#888" stroke-width="1.5"/>
+        <line x1="459" y1="334" x2="455" y2="349" stroke="#888" stroke-width="1.5"/>
+      </g>
+
+      <!-- Mickey mouse legs doing a dance -->
+      <style>
+        @keyframes legL-dance {
+          0%   { transform: rotate(-30deg); }
+          50%  { transform: rotate(10deg); }
+          100% { transform: rotate(-30deg); }
+        }
+        @keyframes legR-dance {
+          0%   { transform: rotate(10deg); }
+          50%  { transform: rotate(-30deg); }
+          100% { transform: rotate(10deg); }
+        }
+        @keyframes shoeL-dance {
+          0%   { transform: rotate(20deg); }
+          50%  { transform: rotate(-10deg); }
+          100% { transform: rotate(20deg); }
+        }
+        @keyframes shoeR-dance {
+          0%   { transform: rotate(-10deg); }
+          50%  { transform: rotate(20deg); }
+          100% { transform: rotate(-10deg); }
+        }
+        .leg-l { animation: legL-dance 0.4s ease-in-out infinite; transform-origin: 240px 414px; }
+        .leg-r { animation: legR-dance 0.4s ease-in-out infinite; transform-origin: 340px 414px; }
+        .shoe-l { animation: legL-dance 0.4s ease-in-out infinite; transform-origin: 240px 450px; }
+        .shoe-r { animation: legR-dance 0.4s ease-in-out infinite; transform-origin: 340px 450px; }
+      </style>
+      <g class="leg-l">
+        <rect x="228" y="414" width="24" height="42" rx="10" fill="#0a8a9a" stroke="#05c8d8" stroke-width="2"/>
+      </g>
+      <g class="leg-r">
+        <rect x="328" y="414" width="24" height="42" rx="10" fill="#0a8a9a" stroke="#05c8d8" stroke-width="2"/>
+      </g>
+      <!-- Shoes -->
+      <g class="shoe-l">
+        <ellipse cx="240" cy="458" rx="22" ry="12" fill="#1a1a1a" stroke="#333" stroke-width="1.5"/>
+        <ellipse cx="250" cy="455" rx="10" ry="7" fill="#2a2a2a" opacity="0.5"/>
+      </g>
+      <g class="shoe-r">
+        <ellipse cx="340" cy="458" rx="22" ry="12" fill="#1a1a1a" stroke="#333" stroke-width="1.5"/>
+        <ellipse cx="350" cy="455" rx="10" ry="7" fill="#2a2a2a" opacity="0.5"/>
+      </g>
+
       <!-- Toaster cord — electric teal -->
       <path d="M290,410 Q290,440 320,445 Q360,450 370,430" fill="none" stroke="#0a8a9a" stroke-width="4" stroke-linecap="round"/>
       <path d="M290,410 Q290,440 320,445 Q360,450 370,430" fill="none" stroke="#05c8d8" stroke-width="1.5" stroke-linecap="round" opacity="0.5" stroke-dasharray="4,6"/>
