@@ -357,17 +357,60 @@
       <text x="218" y="362" text-anchor="middle" font-family="monospace" font-size="5" fill="#777">LOT 88 · MFG 2024</text>
       <text x="218" y="369" text-anchor="middle" font-family="monospace" font-size="5" fill="#555">MAX 1400W · CE ✓</text>
 
-      <!-- WIZARD HAT -->
+      <!-- WIZARD HAT — ripped open with capybara inside -->
       <!-- Hat brim -->
       <ellipse cx="290" cy="222" rx="72" ry="14" fill="#2a0a4a" stroke="#7b2fa0" stroke-width="2"/>
-      <!-- Hat cone -->
-      <polygon points="290,60 218,222 362,222" fill="#3a0a6a" stroke="#7b2fa0" stroke-width="2"/>
-      <!-- Hat band -->
+      <!-- Hat cone LEFT piece (torn) -->
+      <polygon points="290,60 218,222 270,222 260,180 248,140 255,100 268,70" fill="#3a0a6a" stroke="#7b2fa0" stroke-width="2"/>
+      <!-- Hat cone RIGHT piece (torn) -->
+      <polygon points="290,60 362,222 310,222 320,180 332,140 325,100 312,70" fill="#3a0a6a" stroke="#7b2fa0" stroke-width="2"/>
+      <!-- Rip/tear jagged edges -->
+      <polyline points="268,70 272,82 264,95 275,110 263,125 274,140 261,158 275,172 265,190 275,207 268,222" fill="none" stroke="#c47aff" stroke-width="2.5" stroke-linejoin="round"/>
+      <polyline points="312,70 308,82 316,95 305,110 317,125 306,140 319,158 305,172 315,190 305,207 312,222" fill="none" stroke="#c47aff" stroke-width="2.5" stroke-linejoin="round"/>
+      <!-- Glow from inside rip -->
+      <ellipse cx="290" cy="155" rx="28" ry="55" fill="#ffe090" opacity="0.18"/>
+
+      <!-- CAPYBARA bursting out of hat -->
+      <!-- Body -->
+      <ellipse cx="290" cy="170" rx="34" ry="28" fill="#b8864e" stroke="#7a5520" stroke-width="1.5"/>
+      <!-- Head -->
+      <ellipse cx="290" cy="132" rx="26" ry="22" fill="#c49a60" stroke="#7a5520" stroke-width="1.5"/>
+      <!-- Snout/muzzle -->
+      <ellipse cx="290" cy="148" rx="16" ry="11" fill="#d4aa78" stroke="#7a5520" stroke-width="1"/>
+      <!-- Nostrils -->
+      <ellipse cx="284" cy="149" rx="3" ry="2.5" fill="#5a3010"/>
+      <ellipse cx="296" cy="149" rx="3" ry="2.5" fill="#5a3010"/>
+      <!-- Eyes -->
+      <ellipse cx="278" cy="133" rx="6" ry="6.5" fill="#2a1a08" stroke="#7a5520" stroke-width="1"/>
+      <circle cx="276" cy="131" r="2" fill="white"/>
+      <ellipse cx="302" cy="133" rx="6" ry="6.5" fill="#2a1a08" stroke="#7a5520" stroke-width="1"/>
+      <circle cx="300" cy="131" r="2" fill="white"/>
+      <!-- Ears -->
+      <ellipse cx="268" cy="116" rx="9" ry="7" fill="#c49a60" stroke="#7a5520" stroke-width="1.2"/>
+      <ellipse cx="268" cy="116" rx="5" ry="4" fill="#e8c090" opacity="0.7"/>
+      <ellipse cx="312" cy="116" rx="9" ry="7" fill="#c49a60" stroke="#7a5520" stroke-width="1.2"/>
+      <ellipse cx="312" cy="116" rx="5" ry="4" fill="#e8c090" opacity="0.7"/>
+      <!-- Tiny arms poking out -->
+      <ellipse cx="260" cy="175" rx="10" ry="7" fill="#b8864e" stroke="#7a5520" stroke-width="1" transform="rotate(-20,260,175)"/>
+      <ellipse cx="320" cy="175" rx="10" ry="7" fill="#b8864e" stroke="#7a5520" stroke-width="1" transform="rotate(20,320,175)"/>
+      <!-- Fur texture lines -->
+      <line x1="282" y1="158" x2="279" y2="168" stroke="#9a6a30" stroke-width="0.8" opacity="0.5"/>
+      <line x1="290" y1="160" x2="290" y2="170" stroke="#9a6a30" stroke-width="0.8" opacity="0.5"/>
+      <line x1="298" y1="158" x2="301" y2="168" stroke="#9a6a30" stroke-width="0.8" opacity="0.5"/>
+      <!-- Little smile -->
+      <path d="M283,153 Q290,159 297,153" fill="none" stroke="#5a3010" stroke-width="1.5" stroke-linecap="round"/>
+      <!-- Tiny speech bubble from capybara -->
+      <rect x="316" y="108" width="58" height="22" rx="8" fill="#fff9e0" stroke="#c4a000" stroke-width="1.2"/>
+      <polygon points="320,129 314,138 330,129" fill="#fff9e0" stroke="#c4a000" stroke-width="1"/>
+      <polygon points="322,129 316,136 328,129" fill="#fff9e0"/>
+      <text x="345" y="119" text-anchor="middle" font-family="'Cormorant Garamond',Georgia,serif" font-size="9" font-style="italic" fill="#7a5520">hello :)</text>
+      <text x="345" y="128" text-anchor="middle" font-family="'Cormorant Garamond',Georgia,serif" font-size="8" font-style="italic" fill="#b8864e">i live here</text>
+
+      <!-- Hat band (over rip) -->
       <rect x="222" y="208" width="136" height="16" rx="4" fill="#7b2fa0" stroke="#c47aff" stroke-width="1.5"/>
-      <!-- Star on hat -->
-      <polygon points="290,100 294,113 308,113 297,121 301,134 290,126 279,134 283,121 272,113 286,113" fill="#ffd700" stroke="#c4a000" stroke-width="1"/>
-      <!-- Small stars on hat -->
+      <!-- Star on hat left piece -->
       <polygon points="245,150 247,156 253,156 248,160 250,166 245,162 240,166 242,160 237,156 243,156" fill="#c4a0ff" stroke="#9b70cc" stroke-width="0.8"/>
+      <!-- Star on hat right piece -->
       <polygon points="335,160 337,166 343,166 338,170 340,176 335,172 330,176 332,170 327,166 333,166" fill="#c4a0ff" stroke="#9b70cc" stroke-width="0.8"/>
 
       <!-- TOAST popping out left slot — electric mermaid toast -->
